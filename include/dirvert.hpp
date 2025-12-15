@@ -1,5 +1,5 @@
 #include "dirbase.hpp"
 
-class Dirvert : DirBase {
+class Dirvert : public DirBase {
     
 };
