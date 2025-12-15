@@ -8,8 +8,17 @@ private:
   const std::filesystem::path dirPath;
 
 public:
-  DirBase(std::filesystem::path p) : dirPath(p) {}
-  bool isDir() const;
+  DirBase() : dirPath("") {}
+  
+  struct Opts {
+    bool recur, del;
+    std::string input, output;
+    
+    Opts(int, char**);
+  };
+
+  void isDir() const;
+  virtual ~DirBase();
 };
 
 #endif
