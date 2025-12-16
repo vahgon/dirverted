@@ -20,8 +20,6 @@ void DirBase::Opts::getOpts(int argc, char** argv) {
     c = getopt_long(argc, argv, "i:o::r", long_options, &optIndex);
 
     if (c == -1) break;
-    
-    std::cout<<c<<" !!!!" << std::endl;
     switch(c) {
       case 'i':
         std::cout<<"Option I called with" << optarg << std::endl;
