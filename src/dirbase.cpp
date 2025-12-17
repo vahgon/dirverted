@@ -4,6 +4,10 @@
 
 #include "../include/dirbase.hpp"
 
+void DirBase::Opts::checkOutputOpts(char** argv, int *optIndex, char **optarg) {
+  if (argv[*optIndex][0] == '-') throw std::invalid_argument("Error -- Missing user-defined output directory");
+}
+
 void DirBase::Opts::getOpts(int argc, char** argv) {
   int c, digit_optind = 0;
 
@@ -19,7 +23,9 @@ void DirBase::Opts::getOpts(int argc, char** argv) {
     
     c = getopt_long(argc, argv, "i:o::r", long_options, &optIndex);
 
+    if (c == 111 && !optarg) DirBase::Opts::checkOutputOpts(argv, &currOptsInd, &optarg);
     if (c == -1) break;
+
     switch(c) {
       case 'i':
         std::cout<<"Option I called with" << optarg << std::endl;
