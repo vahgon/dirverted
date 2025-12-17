@@ -16,7 +16,8 @@ public:
     std::string input, output;
     
     static void getOpts(int, char**);
-    bool checkArgs() const;
+    static void checkOutputOpts(char**, int*, char**);
+
   };
 
   void isDir() const;
