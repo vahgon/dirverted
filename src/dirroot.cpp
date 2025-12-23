@@ -1,9 +1,7 @@
 #include "../include/dirroot.hpp"
 #include <iostream>
 
-void DirRoot::formatOutPath(const int argc, char **argv) {
-    
-}
+void DirRoot::createOutDir() const { std::filesystem::create_directories(_outPath); }
 
 void DirRoot::formatOutPath() {
   _outPath = _opts->_odir.relative_path();
