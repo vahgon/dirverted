@@ -11,9 +11,9 @@ Opts(int argc, char **argv) :
     _recursive(false),
     _copy(false),
     _delete(false)
-  { parseOpts(argc, argv); }
+  { this->parseOpts(argc, argv); }
 
-void parseOpts(const int&, char**);
+void parseOpts(const int, char**);
 void dirExists(char*) const;
 
 std::filesystem::path _indir;

@@ -4,7 +4,7 @@
 void isSpacedArg(char **argv, int &ind) { if (optarg[0] == '-') throw std::invalid_argument(std::string(argv[0]) + ": directory must be provided with " + std::string(argv[ind])); }
 void throwMissing(char **argv, int &ind) { throw std::invalid_argument(std::string(argv[0]) + ": invalid arg " + std::string(optarg) + " in " + std::string(argv[ind])); }
 
-void Opts::parseOpts(const int& argc, char** argv) {
+void Opts::parseOpts(const int argc, char** argv) {
   int c, digitOptind = 0;
   while(true) {
     int currOptsInd = optind ? optind : 0;
@@ -33,5 +33,5 @@ void Opts::parseOpts(const int& argc, char** argv) {
 }
 
 void Opts::dirExists(char *argv) const {
-  if (!std::filesystem::is_directory(optarg)) { throw std::invalid_argument(std::string(argv) + ": " + std::string(optarg) + " is not a valid directory"); }
+  if (!std::filesystem::is_directory(optarg)) throw std::invalid_argument(std::string(argv) + ": " + std::string(optarg) + " is not a valid directory"); 
 }
