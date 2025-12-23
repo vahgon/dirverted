@@ -1,12 +1,18 @@
 #ifndef DIRVERT
 #define DIRVERT
 
-#include "dirbase.hpp"
+#include "dirroot.hpp"
+#include <filesystem>
 
-class Dirvert : public DirBase {
+class Dirvert : public DirRoot {
 public:
+  Dirvert();
+ ~Dirvert() { delete _dirNode; } 
 
-  void setOpts(int, char**);
+  const bool isDir(std::filesystem::path& dir) const noexcept { return std::filesystem::is_directory(dir); }  
+
+private:
+  std::filesystem::path *_dirNode;
 };
 
 #endif
