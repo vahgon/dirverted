@@ -1,9 +1,8 @@
 #ifndef DIRROOT
 #define DIRROOT
-
 #include <filesystem>
 #include <memory>
-#include "opts.hpp"
+#include "./opts.hpp"
 
 class DirRoot {
 public:
@@ -11,12 +10,10 @@ public:
     _opts(std::make_unique<Opts>(argc, argv)),
     _rootDir(std::make_unique<std::filesystem::path>(_opts->_indir)),
     _dirIterator(std::make_unique<std::filesystem::recursive_directory_iterator>(*_rootDir))
-  {}
-      
-
-  void formatOutPath(int, char**);
+  { }
+   
+  void formatOutPath();
   void createOutDir() const;
-
   void spanRootDir() noexcept;
 
 protected:
