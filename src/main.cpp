@@ -1,12 +1,14 @@
-#include "../include/dirvert.hpp"
+#include "../include/dirroot.hpp"
+#include <exception>
 #include <iostream>
 
-int main(int argc, char *argv[]) {
+int main(int argc, char **argv) {
+  try {
+  DirRoot *d = new DirRoot(argc, argv);
 
-  Dirvert* tester = new Dirvert; 
-  try { tester->setOpts(argc, argv); }
-  catch(std::invalid_argument err) { std::cerr << err.what(); }
-        
+  d->formatOutPath();
+  d->spanRootDir();
+} catch (std::exception e) { std::cout << e.what() << std::endl; } 
 
   return 0;
 }
