@@ -7,7 +7,8 @@ set ( CMAKE_EXPORT_COMPILE_COMMANDS True )
 
 ADD_LIBRARY( dirvert_lib
   ./src/dirvert.cpp
-  ./src/dirbase.cpp
+  ./src/dirroot.cpp
+  ./src/opts.cpp
   )
 
 ADD_EXECUTABLE( dirvert src/main.cpp )
