@@ -1,18 +1,29 @@
-#ifndef DIRVERT
-#define DIRVERT
+#ifndef DIRVERT_H
+#define DIRVERT_H
 
 #include "dirroot.hpp"
 #include <filesystem>
+#include <vector>
+    
+struct dir_instance{
+  std::filesystem::path parentDir;
+  std::filesystem::path dir;
+  int depth;
+};
 
 class Dirvert : public DirRoot {
 public:
-  Dirvert();
- ~Dirvert() { delete _dirNode; } 
+  Dirvert(int, char**);
 
-  const bool isDir(std::filesystem::path& dir) const noexcept { return std::filesystem::is_directory(dir); }  
+  void begin();
+  void spanRootDir();
+  void announce() const;
+
+  void printSteps() const;
+  void verbosePrintTree() const;
 
 private:
-  std::filesystem::path *_dirNode;
+  std::vector<dir_instance> _dirvertDirectories;
 };
 
 #endif
