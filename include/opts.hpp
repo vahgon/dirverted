@@ -14,23 +14,29 @@ struct Opts {
   std::filesystem::path _odir;
   
   int _recursive;
-  int _copy;
   int _onlyChildren;
-  int _noRoot;
-  
+  int _followSymbolic;
+
+
+  inline static const char* tokens[] = {
+    "children",
+    "symbolic",
+    nullptr
+  };
   enum {
-    NO_ROOT_OPT = 0,
-    COPY_OPT = 0
+    rec_onlychildren_opt = 0,
+    rec_followsymbolic_opt,
   };
 
+  inline static int _verbose = 0;
+  inline static int _quiet = 0;
 
-  static inline int _verbose = 0;
-  static inline struct option long_options[] = {
+  inline static struct option long_options[] = {
     { "input",          required_argument,   0,          'i' },
     { "output",         required_argument,   0,          'o' },
-    { "copy",           optional_argument,   0,          'c' },
     { "recursive",      no_argument,         0,          'r' },
     { "verbose",        no_argument,    &_verbose,        1  },
+    { "quiet",          no_argument,    &_quiet,          1  },
     { 0,                no_argument,         0,           0  }
     };
 };
