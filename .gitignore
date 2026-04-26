@@ -1,7 +1,6 @@
-build*
-.cache*
+/build
+/.cache
 .asm-lsp.toml
 .clangd
-Doxyfile
 compile_commands.json
 Session.vim
