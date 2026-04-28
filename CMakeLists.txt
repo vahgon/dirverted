@@ -18,10 +18,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # -------
 option(DEV_OPTS "Enable dev opts" FALSE)
 option(BUILD_TESTS "Build tests found in 'test/'" FALSE)
-option(GEN_DOCS "Generate docs via Doxygen" FALSE)
-
-# `NO_LATEX` option handled in docs/CMakeLists.txt
-option(NO_LATEX "Prevent Doxygen from generating LaTeX files" FALSE)
+option(INTRINSIC "Import immintrin.h for testing" FALSE)
 
 if(DEV_OPTS)
   set(CMAKE_BUILD_TYPE Debug)
@@ -32,12 +29,6 @@ if(BUILD_TESTS)
   enable_testing()
   include(GoogleTest)
   add_subdirectory(test)
-endif()
-
-if(GEN_DOCS)
-  add_subdirectory(docs)
-elseif(NOT GEN_DOCS AND NO_LATEX)
-  message(WARNING "Redundant option NO_LATEX - GEN_DOCS must also be set.")
 endif()
 
 # -------
