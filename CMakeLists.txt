@@ -32,24 +32,16 @@ if(BUILD_TESTS)
 endif()
 
 # -------
-# library ------------------------------------------
-# -------
-set(DVRT_SRC
-  src/dir.cpp
-  src/read_file.cpp
-  src/streamobj.cpp
-  src/checksum.s
-)
-
-add_library(dvrt STATIC ${DVRT_SRC})
-target_include_directories(dvrt PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/)
-
-include(GenerateExportHeader)
-generate_export_header(dvrt)
-
-# -------
 # compile ------------------------------------------
 # -------
-add_executable(dirvert ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src)
+list(TRANSFORM SRC_FILES PREPEND ${CMAKE_CURRENT_SOURCE_DIR}/src/)
 
-target_link_libraries(dirvert PRIVATE dvrt)
+add_executable(dirvert ${SRC_FILES})
+
+if(INTRINSIC)
+  target_compile_options(dirvert PRIVATE -mavx2)
+  target_compile_definitions(dirvert PRIVATE USE_IMMINTRIN)
+endif()
+
+target_include_directories(dirvert PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/)
