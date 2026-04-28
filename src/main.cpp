@@ -1,6 +1,10 @@
+#include <getopt.h>
+
 #include <string>
 #include <print>
 #include <vector>
+
+#include "dvrt/dirvert.hpp"
 
 class ArgParser {
  private:
@@ -31,8 +35,14 @@ int main(int argc, char** argv) {
   ArgParser input(argc, argv);
 
   if (input.optExists("-h")) {
-    std::print("hi");
+    std::print("This is the help");
     return -1;
+  }
+
+  if (input.optExists("-o")) {
+    auto e = input.getOpt("-o").c_str();
+    dvrt::dirvert file{ e , 2 };
+    file.recursively_iterate_root();
   }
 
   return 0;
