@@ -1,17 +1,17 @@
+#include "dvrt/dirvert.hpp"
+
 #include <algorithm>
 #include <atomic>
 #include <filesystem>
-#include <print>
 #include <ranges>
 #include <thread>
 #include <utility>
 #include <vector>
-#include "dvrt/dirvert.h"
-#include "dvrt/fbuff.h"
 
-//  #include <intrin.h>
+#include "dvrt/fbuff.hpp"
 
 using directory_entry = std::filesystem::directory_entry;
+using file_buff       = dvrt::__buff::fbuff;
 
 dvrt::dirvert::dirvert(const char* path)
   : root_{ std::move(path) } {}
@@ -37,11 +37,10 @@ void dvrt::dirvert::delegate_work(
     std::vector<std::filesystem::directory_entry>& files) {
   std::atomic_size_t idx{ 0 };
   fdata_.reserve(files.size());
-
   auto work = [&]() {
     for (size_t i = idx.fetch_add(1); i < files.size(); i = idx.fetch_add(1)) {
       if (files[i].is_regular_file()) {
-        dvrt::__buff::fbuff get_buffer{ files[i].path() };
+        auto bytes = file_buff{ files[i] }.get_bytes();
       }
     }
   };

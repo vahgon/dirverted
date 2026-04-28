@@ -5,13 +5,13 @@
 #include <map>
 #include <thread>
 #include <vector>
-#include "dvrt/fbuff.h"
+
+#include "dvrt/fbuff.hpp"
 
 namespace dvrt {
 
 class dirvert {
  private:
-  int a = std::thread::hardware_concurrency();
 
   const std::filesystem::path root_;
 
@@ -19,6 +19,8 @@ class dirvert {
            std::vector<std::filesystem::path> > spanned_root_;
 
   std::vector<dvrt::__buff::fbuff> fdata_;
+
+  unsigned int t_count_{ std::thread::hardware_concurrency() };
 
   size_t thread_cnt_;
 
@@ -37,6 +39,6 @@ class dirvert {
   void check_file(const std::filesystem::directory_entry) const;
 };
 
-}  // namespace dvrt::fs
+}  // namespace dvrt
 
 #endif  // DVRT_DIRVERT_H_
