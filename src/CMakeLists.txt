@@ -1,0 +1,9 @@
+set(SRC_FILES
+  main.cpp
+  dirvert.cpp
+  fbuff.cpp
+  checksum.s
+  sliceby4.s
+  sliceby8.s
+  PARENT_SCOPE
+)
