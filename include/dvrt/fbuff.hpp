@@ -1,5 +1,5 @@
-#ifndef DVRT_FBUFF_H_
-#define DVRT_FBUFF_H_
+#ifndef DVRT_FBUFF_HPP_
+#define DVRT_FBUFF_HPP_
 
 #include <filesystem>
 #include <memory>
@@ -26,4 +26,4 @@ class fbuff {
 
 }  // namespace dvrt::__buff
 
-#endif  // DVRT_FBUFF_H_
+#endif  // DVRT_FBUFF_HPP_

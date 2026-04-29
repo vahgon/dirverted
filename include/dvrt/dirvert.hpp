@@ -1,5 +1,5 @@
-#ifndef DVRT_DIRVERT_H_
-#define DVRT_DIRVERT_H_
+#ifndef DVRT_DIRVERT_HPP_
+#define DVRT_DIRVERT_HPP_
 
 #include <filesystem>
 #include <map>
@@ -41,4 +41,4 @@ class dirvert {
 
 }  // namespace dvrt
 
-#endif  // DVRT_DIRVERT_H_
+#endif  // DVRT_DIRVERT_HPP_
