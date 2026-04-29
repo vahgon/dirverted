@@ -6,7 +6,7 @@ project(
   Dirvert 
   VERSION 0.0 
   DESCRIPTION ""
-  LANGUAGES CXX ASM
+  LANGUAGES CXX
 )
 
 set(CMAKE_CXX_STANDARD 23)
