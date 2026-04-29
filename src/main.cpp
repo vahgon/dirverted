@@ -41,8 +41,8 @@ int main(int argc, char** argv) {
 
   if (input.optExists("-o")) {
     auto e = input.getOpt("-o").c_str();
-    dvrt::dirvert file{ e , 2 };
-    file.recursively_iterate_root();
+    dvrt::dirvert file{ e };
+    file.determine_input();
   }
 
   return 0;
