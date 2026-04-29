@@ -4,6 +4,13 @@
 #include <filesystem>
 #include <memory>
 
+namespace dvrt::__crc {
+
+constexpr uint32_t gen_poly{ 0xedb88320 };
+constexpr uint32_t init_crc{ 0xffffffff };
+
+}  // namespace dvrt::__crc
+
 namespace dvrt::__buff {
 
 class fbuff {
@@ -12,7 +19,7 @@ class fbuff {
 
   const size_t fsize_;
 
-  std::shared_ptr<char[]> bytes_;
+  std::shared_ptr<std::byte[]> bytes_;
 
  public:
   explicit fbuff(const std::filesystem::path);
@@ -21,7 +28,9 @@ class fbuff {
 
   void read_bytes();
 
-  uint32_t calc_checksum() const;
+  uint32_t crc32_intrinsic() noexcept;
+
+  uint32_t crc32_lookup_table() noexcept;
 };
 
 }  // namespace dvrt::__buff

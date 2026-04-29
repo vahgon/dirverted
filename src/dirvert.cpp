@@ -3,51 +3,58 @@
 #include <algorithm>
 #include <atomic>
 #include <filesystem>
+#include <iterator>
 #include <ranges>
 #include <thread>
-#include <utility>
 #include <vector>
 
 #include "dvrt/fbuff.hpp"
 
-using directory_entry = std::filesystem::directory_entry;
-using file_buff       = dvrt::__buff::fbuff;
+using file_buff = dvrt::__buff::fbuff;
+using dirvert   = dvrt::dirvert;
 
-dvrt::dirvert::dirvert(const char* path)
-  : root_{ std::move(path) } {}
+namespace fs    = std::filesystem;
 
-dvrt::dirvert::dirvert(const char* path, size_t bsize)
-  : root_{ std::move(path) }
-  , thread_cnt_{ std::move(bsize) } {}
+dirvert::dirvert(const char* path)
+  : root_{ path } {}
 
-void dvrt::dirvert::recursively_iterate_root() {
-  auto paths_in_root = std::ranges::to<std::vector>(
-                       std::filesystem::recursive_directory_iterator{ root_ });
+dirvert::dirvert(const char* path, size_t bsize)
+  : root_{ path }
+  , t_count_{ bsize } {}
 
-  auto is_subdir = [](const std::filesystem::directory_entry& path) {
-    return path.is_directory();
-  };
-
-  auto fnd_files{ std::ranges::partition(paths_in_root, is_subdir) };
-
-  delegate_work(paths_in_root);
+void dirvert::determine_input() {
+  if (fs::is_directory(root_))
+    recursively_iterate_root();
+  else
+    file_buff{ root_ }.crc32_lookup_table();
 }
 
-void dvrt::dirvert::delegate_work(
-    std::vector<std::filesystem::directory_entry>& files) {
+void dirvert::recursively_iterate_root() {
+  auto paths = std::ranges::to<std::vector>(
+               fs::recursive_directory_iterator{ root_ });
+
+  auto is_file = [](const fs::directory_entry& path) {
+    return path.is_regular_file();
+  };
+
+  auto files{ std::ranges::partition(paths, is_file) };
+
+  delegate_work({ std::ranges::begin(paths), std::ranges::begin(files) });
+}
+
+void dirvert::delegate_work(const std::span<fs::directory_entry>& files) {
   std::atomic_size_t idx{ 0 };
   fdata_.reserve(files.size());
+
   auto work = [&]() {
     for (size_t i = idx.fetch_add(1); i < files.size(); i = idx.fetch_add(1)) {
-      if (files[i].is_regular_file()) {
-        auto bytes = file_buff{ files[i] }.get_bytes();
-      }
+      auto bytes = file_buff{ files[i] }.crc32_lookup_table();
     }
   };
 
   std::vector<std::jthread> threads;
-  threads.reserve(thread_cnt_);
+  for (size_t i = 0; i < t_count_; i++)
+    threads.push_back(std::jthread(work));
 
-  for (size_t i = 0; i < thread_cnt_; i++)
-    threads.emplace_back(work);
+  threads.clear();
 }
