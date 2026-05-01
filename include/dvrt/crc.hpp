@@ -1,10 +1,15 @@
-#ifndef DVRT_CRCTABLE_HPP_
-#define DVRT_CRCTABLE_HPP_
+#ifndef DVRT_CRC_HPP_
+#define DVRT_CRC_HPP_
+
+#include <cstddef>
 
 #include <array>
 #include <cstdint>
 
-namespace dvrt::__crc {
+namespace dvrt::crc::__internal {
+
+constexpr uint32_t gen_poly{ 0xedb88320 };
+constexpr uint32_t init_crc{ 0xffffffff };
 
 constexpr std::array<uint32_t, 256> crctable {
   0x00000000, 0x77073096, 0xee0e612c, 0x990951ba,
@@ -75,4 +80,12 @@ constexpr std::array<uint32_t, 256> crctable {
 
 }  // namespace dvrt::__crc
 
-#endif  // DVRT_CRCTABLE_HPP_
+namespace dvrt::crc {
+
+uint32_t crc32_intrinsic(char*, size_t&);
+
+uint32_t crc32_lookup(char*, size_t&);
+
+}  // namespace dvrt::crc
+
+#endif  // DVRT_CRC_HPP_
