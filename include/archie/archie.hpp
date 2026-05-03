@@ -1,10 +1,10 @@
-#ifndef DVRT_DIRVERT_HPP_
-#define DVRT_DIRVERT_HPP_
+#ifndef ARCHIE_DIRVERT_HPP_
+#define ARCHIE_DIRVERT_HPP_
 
 #include <filesystem>
 #include <thread>
 
-namespace dvrt {
+namespace archie {
 
 class dirvert {
  private:
@@ -27,6 +27,6 @@ class dirvert {
   void determine_input();
 };
 
-}  // namespace dvrt
+}  // namespace archie
 
-#endif  // DVRT_DIRVERT_HPP_
+#endif  // ARCHIE_DIRVERT_HPP_

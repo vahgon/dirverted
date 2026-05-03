@@ -4,7 +4,7 @@
 #include <print>
 #include <vector>
 
-#include "dvrt/dirvert.hpp"
+#include "archie/archie.hpp"
 
 class ArgParser {
  private:
@@ -41,7 +41,7 @@ int main(int argc, char** argv) {
 
   if (input.optExists("-o")) {
     auto e = input.getOpt("-o").c_str();
-    dvrt::dirvert file{ e };
+    archie::dirvert file{ e };
     file.determine_input();
   }
 

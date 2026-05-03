@@ -1,4 +1,4 @@
-#include "dvrt/dirvert.hpp"
+#include "archie/archie.hpp"
 
 #include <algorithm>
 #include <atomic>
@@ -8,25 +8,27 @@
 #include <thread>
 #include <vector>
 
-#include "dvrt/fbuff.hpp"
+#include "archie/filedata.hpp"
 
-using file_buff = dvrt::__buff::fbuff;
-using dirvert   = dvrt::dirvert;
+namespace fs  = std::filesystem;
 
-namespace fs    = std::filesystem;
+using file    = archie::file;
+using dirvert = archie::dirvert;
 
 dirvert::dirvert(const char* path)
-  : root_{ path } {}
+: root_{ path } {}
 
-dirvert::dirvert(const char* path, size_t bsize)
-  : root_{ path }
-  , t_count_{ bsize } {}
+dirvert::dirvert(const char* path, size_t num_threads)
+: root_{ path }
+, thread_cnt_{ num_threads } {}
 
 void dirvert::determine_input() {
   if (fs::is_directory(root_))
     recursively_iterate_root();
-  else
-    file_buff{ root_ }.crc32_lookup_table();
+  else {
+    file f{ root_ };
+    f.get_byte_reps();
+  }
 }
 
 void dirvert::recursively_iterate_root() {
@@ -44,16 +46,15 @@ void dirvert::recursively_iterate_root() {
 
 void dirvert::delegate_work(const std::span<fs::directory_entry>& files) {
   std::atomic_size_t idx{ 0 };
-  fdata_.reserve(files.size());
 
   auto work = [&]() {
     for (size_t i = idx.fetch_add(1); i < files.size(); i = idx.fetch_add(1)) {
-      auto bytes = file_buff{ files[i] }.crc32_lookup_table();
+      auto bytes = file{ files[i] };
     }
   };
 
   std::vector<std::jthread> threads;
-  for (size_t i = 0; i < t_count_; i++)
+  for (size_t i = 0; i < thread_cnt_; i++)
     threads.push_back(std::jthread(work));
 
   threads.clear();

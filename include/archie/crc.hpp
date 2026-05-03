@@ -1,12 +1,13 @@
-#ifndef DVRT_CRC_HPP_
-#define DVRT_CRC_HPP_
+#ifndef ARCHIE_CRC_HPP_
+#define ARCHIE_CRC_HPP_
 
 #include <cstddef>
 
 #include <array>
 #include <cstdint>
+#include <memory>
 
-namespace dvrt::crc::__internal {
+namespace archie::crc::__internal {
 
 constexpr uint32_t gen_poly{ 0xedb88320 };
 constexpr uint32_t init_crc{ 0xffffffff };
@@ -78,14 +79,14 @@ constexpr std::array<uint32_t, 256> crctable {
   0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d,
 };
 
-}  // namespace dvrt::__crc
+}  // namespace archie::crc::__internal
 
-namespace dvrt::crc {
+namespace archie::crc {
 
-uint32_t crc32_intrinsic(char*, size_t&);
+uint32_t crc32_intrinsic(std::weak_ptr<std::byte[]>, const size_t&);
 
-uint32_t crc32_lookup(char*, size_t&);
+uint32_t crc32_lookup(std::weak_ptr<std::byte[]>, const size_t&);
 
-}  // namespace dvrt::crc
+}  // namespace archie::crc
 
-#endif  // DVRT_CRC_HPP_
+#endif  // ARCHIE_CRC_HPP_
