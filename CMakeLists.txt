@@ -1,9 +1,9 @@
 # -------------------------------------------------
-# -                    dirvert                    -
+# -                    archie                     -
 # -------------------------------------------------
 cmake_minimum_required(VERSION 3.12)
 project(
-  Dirvert 
+  Archie 
   VERSION 0.0 
   DESCRIPTION ""
   LANGUAGES CXX
@@ -37,11 +37,11 @@ endif()
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src)
 list(TRANSFORM SRC_FILES PREPEND ${CMAKE_CURRENT_SOURCE_DIR}/src/)
 
-add_executable(dirvert ${SRC_FILES})
+add_executable(archie ${SRC_FILES})
 
 if(INTRINSIC)
-  target_compile_options(dirvert PRIVATE -mavx2)
-  target_compile_definitions(dirvert PRIVATE USE_IMMINTRIN)
+  target_compile_options(archie PRIVATE -mavx2)
+  target_compile_definitions(archie PRIVATE USE_IMMINTRIN)
 endif()
 
-target_include_directories(dirvert PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/)
+target_include_directories(archie PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/)
