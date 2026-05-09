@@ -38,6 +38,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src)
 list(TRANSFORM SRC_FILES PREPEND ${CMAKE_CURRENT_SOURCE_DIR}/src/)
 
 add_executable(archie ${SRC_FILES})
+add_definitions(-Wall -Wextra)
 
 if(INTRINSIC)
   target_compile_options(archie PRIVATE -mavx2)
