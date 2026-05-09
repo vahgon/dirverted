@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <filesystem>
-#include <string>
 
 #include "archie/file/buffer.hpp"
 
@@ -29,8 +28,8 @@ class file {
   uintmax_t                   m_size;
   uint32_t                    m_crc32;
   uint32_t                    m_dos_mtime_;
-  std::string                 m_path_str;
-  std::byte*                  m_buffer;
+  std::byte*                  m_path_str{ nullptr };
+  std::byte*                  m_buffer{ nullptr };
 
  private:
   friend uint64_t bytes::read_buffer(file*);
