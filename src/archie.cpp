@@ -8,34 +8,26 @@
 #include <thread>
 #include <vector>
 
-#include "archie/filedata.hpp"
-
-namespace fs  = std::filesystem;
+#include "archie/file/file.hpp"
 
 using file    = archie::file;
-using dirvert = archie::dirvert;
+using archive = archie::archive;
 
-dirvert::dirvert(const char* path)
-: root_{ path } {}
-
-dirvert::dirvert(const char* path, size_t num_threads)
-: root_{ path }
-, thread_cnt_{ num_threads } {}
-
-void dirvert::determine_input() {
-  if (fs::is_directory(root_))
+void archive::determine_root_type() const {
+  if (std::filesystem::is_directory(m_root)) {
     recursively_iterate_root();
-  else {
-    file f{ root_ };
-    f.get_byte_reps();
+  } else {
+    file f{ m_root };
   }
 }
 
-void dirvert::recursively_iterate_root() {
-  auto paths = std::ranges::to<std::vector>(
-               fs::recursive_directory_iterator{ root_ });
+void archive::recursively_iterate_root() const {
+  auto paths{
+    std::ranges::to<std::vector>(
+      std::filesystem::recursive_directory_iterator{ m_root })
+  };
 
-  auto is_file = [](const fs::directory_entry& path) {
+  auto is_file = [](const std::filesystem::directory_entry& path) {
     return path.is_regular_file();
   };
 
@@ -44,9 +36,9 @@ void dirvert::recursively_iterate_root() {
   delegate_work({ std::ranges::begin(paths), std::ranges::begin(files) });
 }
 
-void dirvert::delegate_work(const std::span<fs::directory_entry>& files) {
+void archive::delegate_work(const std::span<std::filesystem::directory_entry>& files) const {
   std::atomic_size_t idx{ 0 };
-
+ 
   auto work = [&]() {
     for (size_t i = idx.fetch_add(1); i < files.size(); i = idx.fetch_add(1)) {
       auto bytes = file{ files[i] };
@@ -54,8 +46,9 @@ void dirvert::delegate_work(const std::span<fs::directory_entry>& files) {
   };
 
   std::vector<std::jthread> threads;
-  for (size_t i = 0; i < thread_cnt_; i++)
+  for (size_t i{ 0 }; i < m_usable_threads; i++) {
     threads.push_back(std::jthread(work));
+  }
 
   threads.clear();
 }

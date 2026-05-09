@@ -12,7 +12,7 @@ class ArgParser {
 
  public:
   ArgParser(int& argc, char** argv) {
-    for (size_t i = 0; i < argc; i++) {
+    for (size_t i{ 0 }; i < argc; i++) {
       tokens_.push_back(argv[i]);
     }
   }
@@ -40,9 +40,8 @@ int main(int argc, char** argv) {
   }
 
   if (input.optExists("-o")) {
-    auto e = input.getOpt("-o").c_str();
-    archie::dirvert file{ e };
-    file.determine_input();
+    auto in_file = input.getOpt("-o").c_str();
+    archie::archive file{ in_file, 1 };
   }
 
   return 0;
