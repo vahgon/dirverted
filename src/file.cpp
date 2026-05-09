@@ -10,7 +10,8 @@ using path = std::filesystem::path;
 
 void archie::file::set_file_info() {
   m_size = std::filesystem::file_size(m_path);
-  archie::bytes::read_buffer(this);
+
+  [[maybe_unused]] auto x{ archie::bytes::read_buffer(this) };
 }
 
 void archie::file::determine_zip_filetype() {
