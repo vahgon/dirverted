@@ -5,43 +5,24 @@
 
 namespace headers::extra_field {
 
-template<bool IsZip64>
-struct zip{ };
+struct __attribute__((packed)) zip {
+  const uint16_t  m_id{ 0x5455 };
+  const uint16_t  m_extra_field_size{ 5 };
+  const uint8_t   m_flags{ 0x80 };  // Only mod time bit set
+  uint32_t        m_mtime;
 
-// zip
-template<>
-struct __attribute__((packed)) zip<false> {
- public:
-  const uint16_t id_{ 0x5455 };
-
-  const uint16_t exf_sz_{ 5 };
-
-  const uint8_t flags_{ 0x80 };  // Only mod time bit set
-
-  uint32_t mod_time_;
-
- public:
   zip() = default;
 };
 
-// zip64
-template<>
-struct __attribute__((packed)) zip<true> {
- public:
-  const uint16_t id_{ 0x0001 };
+struct __attribute__((packed)) zip64 {
+  const uint16_t  m_id{ 0x0001 };
+  const uint16_t  m_extra_field_size{ 28 };
+  uint64_t        m_uncompressed_size;
+  uint64_t        m_compressed_size;
+  uint64_t        m_lfh_offset;
+  uint32_t        m_this_file_disk_offset;
 
-  const uint16_t exf_sz_{ 28 };
-
-  uint64_t uncomp_sz_;
-
-  uint64_t comp_sz_;
-
-  uint64_t lfh_off_;
-
-  uint32_t file_disk_loc_;
-
- public:
-  zip() = default;
+  zip64() = default;
 };
 
 }  // namespace headers::extra_field

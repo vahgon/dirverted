@@ -1,15 +1,14 @@
 #ifndef ARCHIE_CRC_HPP_
 #define ARCHIE_CRC_HPP_
 
-#include <cstddef>
-
 #include <array>
+#include <cstddef>
 #include <cstdint>
-#include <memory>
 
-namespace archie::crc::__internal {
+namespace archie::crc::__init {
 
 constexpr uint32_t gen_poly{ 0xedb88320 };
+
 constexpr uint32_t init_crc{ 0xffffffff };
 
 constexpr std::array<uint32_t, 256> crctable {
@@ -79,13 +78,13 @@ constexpr std::array<uint32_t, 256> crctable {
   0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d,
 };
 
-}  // namespace archie::crc::__internal
+}  // namespace archie::crc::__init
 
 namespace archie::crc {
 
-uint32_t crc32_intrinsic(std::weak_ptr<std::byte[]>, const size_t&);
+[[noreturn]] uint32_t crc32_intrinsic(const std::byte*, size_t);
 
-uint32_t crc32_lookup(std::weak_ptr<std::byte[]>, const size_t&);
+uint32_t crc32_lookup(const std::byte*, size_t);
 
 }  // namespace archie::crc
 

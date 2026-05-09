@@ -3,14 +3,13 @@
 
 #include <cstdint>
 #include <filesystem>
-#include <memory>
 #include <string>
 
 namespace archie::convert {
 
 uint32_t byte_time(const std::filesystem::path&);
 
-void path_bytes(const std::filesystem::path&, std::weak_ptr<std::byte[]>);
+[[nodiscard]] void* path_bytes(const std::filesystem::path&);
 
 uint16_t path_size_bytes(const std::string&);
 

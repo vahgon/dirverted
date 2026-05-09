@@ -2,38 +2,24 @@
 #define ARCHIE_HEADERS_LFH_HPP_
 
 #include <cstdint>
-#include <variant>
-
-#include "archie/headers/extra_field.hpp"
 
 namespace headers {
 
+constexpr auto ZIP_THRESHOLD{ 1024ULL * 1024ULL * 1024ULL };
+
 struct __attribute__((packed)) lfh {
- public:
-  const uint32_t file_signature{ 0x504b0304 };
+  const uint32_t  m_file_signature{ 0x504b0304 };
+  const uint16_t  m_gen_purpose_flag{ 0x0000 };
+  const uint16_t  m_comp_method{ 0x0000 };
+  uint32_t        m_mtime;  // MS-DOS 16-bit date 16-bit time
+  uint32_t        m_crc32;
+  uint32_t        m_uncompressed_size;
+  uint32_t        m_compressed_size;
+  uint16_t        m_path_size;
+  uint16_t        m_extra_field_size;
 
-  const uint16_t gen_purpose_flag{ 0x0000 };
-
-  const uint16_t comp_method{ 0x0000 };
-
-  uint32_t file_last_mod;  // MS-DOS 16-bit date 16-bit time
-
-  uint32_t crc32;
-
-  uint32_t uncomp_sz;
-
-  uint32_t comp_sz;
-
-  uint16_t file_name_len;
-
-  uint16_t ext_field_len;
-
-// path chars
- public:
+  // m_path_name_bytes
   lfh() = default;
-
-  void generate_extra_field(uintmax_t sizeof_data) {
-  }
 };
 
 }  // namespace headers

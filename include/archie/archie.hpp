@@ -6,25 +6,27 @@
 
 namespace archie {
 
-class dirvert {
- private:
-  const std::filesystem::path root_;
+class archive {
+ public:
+  explicit archive(std::string_view t_root_path)
+  : m_root{ t_root_path } {}
 
-  size_t thread_cnt_{ std::thread::hardware_concurrency() };
+  archive(std::string_view t_root_path, uint32_t t_thread_count)
+  : m_root{ t_root_path }
+  , m_usable_threads{ t_thread_count } {}
+
+  void determine_root_type() const;
 
  private:
-  void delegate_work(const std::span<std::filesystem::directory_entry>&);
+  const std::filesystem::path m_root;
+  uint32_t m_usable_threads{ std::thread::hardware_concurrency() };
+
+ private:
+  void delegate_work(const std::span<std::filesystem::directory_entry>&) const;
 
   void check_file(const std::filesystem::directory_entry) const;
 
-  void recursively_iterate_root();
-
- public:
-  explicit dirvert(const char*);
-
-  dirvert(const char*, size_t);
-
-  void determine_input();
+  void recursively_iterate_root() const;
 };
 
 }  // namespace archie
