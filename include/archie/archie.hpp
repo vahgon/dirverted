@@ -8,25 +8,23 @@ namespace archie {
 
 class archive {
  public:
-  explicit archive(std::string_view t_root_path)
+  explicit archive(const std::string_view t_root_path)
   : m_root{ t_root_path } {}
 
-  archive(std::string_view t_root_path, uint32_t t_thread_count)
-  : m_root{ t_root_path }
-  , m_usable_threads{ t_thread_count } {}
+  archive(const std::string_view t_root_path, uint32_t t_thread_count)
+  : m_root{ t_root_path }, m_usable_threads{ t_thread_count } {}
 
-  void determine_root_type() const;
+  void archive_root();
 
- private:
-  const std::filesystem::path m_root;
-  uint32_t m_usable_threads{ std::thread::hardware_concurrency() };
-
- private:
   void delegate_work(const std::span<std::filesystem::directory_entry>&) const;
 
   void check_file(const std::filesystem::directory_entry) const;
 
-  void recursively_iterate_root() const;
+  void iterate_root();
+
+ private:
+  const std::string_view m_root{};
+  uint32_t m_usable_threads{ std::thread::hardware_concurrency() };
 };
 
 }  // namespace archie

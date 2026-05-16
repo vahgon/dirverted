@@ -5,30 +5,39 @@
 #include <filesystem>
 #include <iterator>
 #include <ranges>
+#include <span>
 #include <thread>
 #include <vector>
 
 #include "archie/file/file.hpp"
 
-using file    = archie::file;
-using archive = archie::archive;
+void archie::archive::archive_root() {
+  std::filesystem::path root_path{};
 
-void archive::determine_root_type() const {
+  try {
+    root_path = m_root;
+    if (std::filesystem::is_directory(m_root)) {
+      iterate_root();
+    } else {
+      archie::file root_file{ m_root };
+    }
+  } catch(...) {
+    throw;
+  }
+
   if (std::filesystem::is_directory(m_root)) {
-    recursively_iterate_root();
+    iterate_root();
   } else {
     file f{ m_root };
+    f.get_filebuf();
   }
 }
+void archie::archive::iterate_root() {
+  auto is_file = [](auto &path) { return path.is_regular_file(); };
 
-void archive::recursively_iterate_root() const {
   auto paths{
     std::ranges::to<std::vector>(
       std::filesystem::recursive_directory_iterator{ m_root })
-  };
-
-  auto is_file = [](const std::filesystem::directory_entry& path) {
-    return path.is_regular_file();
   };
 
   auto files{ std::ranges::partition(paths, is_file) };
@@ -36,11 +45,11 @@ void archive::recursively_iterate_root() const {
   delegate_work({ std::ranges::begin(paths), std::ranges::begin(files) });
 }
 
-void archive::delegate_work(const std::span<std::filesystem::directory_entry>& files) const {
+void archie::archive::delegate_work(const std::span<std::filesystem::directory_entry>& files) const {
   std::atomic_size_t idx{ 0 };
  
   auto work = [&]() {
-    for (size_t i = idx.fetch_add(1); i < files.size(); i = idx.fetch_add(1)) {
+    for (auto i = idx.fetch_add(1); i < files.size(); i = idx.fetch_add(1)) {
       auto bytes = file{ files[i] };
     }
   };

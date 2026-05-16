@@ -16,20 +16,21 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # -------
 # options -----------------------------------------
 # -------
-option(BUILD_TESTS "Build tests found in 'test/'" FALSE)
-option(INTRINSIC "Import immintrin.h for testing" FALSE)
-
-if(BUILD_TESTS)
-  enable_testing()
-  include(GoogleTest)
-  add_subdirectory(test)
-endif()
-
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
   set(CMAKE_BUILD_TYPE Release)
 else()
   set(CMAKE_BUILD_TYPE Release)
+endif()
+
+option(BUILD_TESTS "Build tests found in 'test/'" FALSE)
+option(INTRINSIC "Import immintrin.h for testing" FALSE)
+option(PROFILER "Build with gprof" FALSE)
+
+if(BUILD_TESTS)
+  enable_testing()
+  include(GoogleTest)
+  add_subdirectory(test)
 endif()
 
 # -------
@@ -55,12 +56,16 @@ set(DEBUG_FLAGS
   -Wnrvo
   -Werror
   -Wpedantic
+  -O0
   ${SANITIZE_OPTS}
 )
 
 target_compile_options(archie PRIVATE "$<$<CONFIG:DEBUG>:${DEBUG_FLAGS}>")
-
 target_link_options(archie PRIVATE "$<$<CONFIG:DEBUG>:${SANITIZE_OPTS}>")
+
+if(PROFILER)
+  target_compile_options(archie PRIVATE "$<$<CONFIG:DEBUG>:-pg>")
+endif()
 
 # ----------------
 # gcc release opts
@@ -68,7 +73,8 @@ target_link_options(archie PRIVATE "$<$<CONFIG:DEBUG>:${SANITIZE_OPTS}>")
 set(RELEASE_FLAGS
   -Wall
   -Wextra
-  -O2)
+  -O2
+)
 
 target_compile_options(archie PRIVATE "$<$<CONFIG:RELEASE>:${RELEASE_FLAGS}>")
 

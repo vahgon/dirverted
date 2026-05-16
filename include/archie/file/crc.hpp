@@ -2,8 +2,9 @@
 #define ARCHIE_CRC_HPP_
 
 #include <array>
-#include <cstddef>
 #include <cstdint>
+
+namespace archie { class file; }
 
 namespace archie::crc::__init {
 
@@ -82,9 +83,9 @@ constexpr std::array<uint32_t, 256> crctable {
 
 namespace archie::crc {
 
-[[noreturn]] uint32_t crc32_intrinsic(const std::byte*, size_t);
+[[noreturn]] uint32_t crc32_intrinsic(void*);
 
-uint32_t crc32_lookup(const std::byte*, size_t);
+[[nodiscard]] uint32_t crc32_lookup(std::byte*, std::size_t);
 
 }  // namespace archie::crc
 

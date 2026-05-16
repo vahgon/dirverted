@@ -3,7 +3,6 @@
 #include <chrono>
 #include <cstdint>
 #include <filesystem>
-#include <string>
 
 uint32_t archie::convert::byte_time(const std::filesystem::path& file_path) {
   /* MS-DOS byte-formatted time */
@@ -49,8 +48,4 @@ uint32_t archie::convert::mod_time_ext_timestamp(const std::filesystem::path& fi
   return static_cast<uint32_t>(
     std::chrono::duration_cast<std::chrono::seconds>(
       ctime.time_since_epoch()).count());
-}
-
-uint16_t archie::convert::path_size_bytes(const std::string& path_str) {
-  return static_cast<uint16_t>(path_str.size());
 }
