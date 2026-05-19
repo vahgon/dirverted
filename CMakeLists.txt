@@ -18,7 +18,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # -------
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
-  set(CMAKE_BUILD_TYPE Release)
+  set(CMAKE_BUILD_TYPE Debug)
 else()
   set(CMAKE_BUILD_TYPE Release)
 endif()
