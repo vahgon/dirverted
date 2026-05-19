@@ -56,6 +56,7 @@ set(DEBUG_FLAGS
   -Wnrvo
   -Werror
   -Wpedantic
+  -Wconversion
   -O0
   ${SANITIZE_OPTS}
 )
