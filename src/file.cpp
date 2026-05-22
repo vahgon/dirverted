@@ -60,7 +60,13 @@ std::uint32_t archie::file::mtime() const {
 }
 
 std::uint32_t archie::file::mtime_ext() const {
-  return 1;
+  auto mtime{ chrono::clock_cast<chrono::system_clock>(
+    std::filesystem::last_write_time(m_path))
+  };
+
+  return static_cast<std::uint32_t>(
+    chrono::duration_cast<chrono::seconds>(
+      mtime.time_since_epoch()).count());
 }
 
 template<>
