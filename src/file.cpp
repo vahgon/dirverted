@@ -11,6 +11,25 @@
 
 namespace chrono = std::chrono;
 
+std::string_view archie::file::buff_view() const noexcept {
+  return std::string_view{ reinterpret_cast<const char*>(m_buff.data()), m_size };
+}
+
+void archie::file::deserialize_fs_path() {
+  std::filebuf io_file;
+
+  if (!io_file.open(m_path, std::ios::binary | std::ios::in))  {
+    throw std::runtime_error(std::format("err opening {}", m_path.c_str()));
+  } else {
+    io_file.sgetn(reinterpret_cast<char*>(m_buff.data()),
+                  static_cast<std::streamsize>(m_size));
+
+    mtime();
+
+    io_file.close();
+  }
+}
+
 std::uint32_t archie::file::mtime() const {
   auto file_t{ chrono::clock_cast<chrono::system_clock>(
     std::filesystem::last_write_time(m_path))
@@ -40,33 +59,18 @@ std::uint32_t archie::file::mtime() const {
   return static_cast<std::uint32_t>(mdate << 16) | mtime;
 }
 
-std::uint32_t archie::file::mtime_ext() const noexcept {
+std::uint32_t archie::file::mtime_ext() const {
   return 1;
 }
 
 template<>
-std::size_t archie::set_headers<true>(std::size_t size) {
-  assert(size >= headers::SizeThreshold);
-  return size;
+std::size_t archie::set_headers<true>() {
+  assert(1 >= headers::SizeThreshold);
+  return 1;
 }
 
 template<>
-std::size_t archie::set_headers<false>(std::size_t size) {
-  assert(size < headers::SizeThreshold);
-  return size;
-}
-
-void archie::deserialize_fs_path(const std::filesystem::path& path) {
-  archie::file file{ path };
-  std::filebuf io_file{};
-
-  if (io_file.open(path, std::ios::binary | std::ios::in)) {
-    auto file_buff{ const_cast<std::byte*>(file.buffer_bytes()) };
-
-    io_file.sgetn(reinterpret_cast<char*>(file_buff), static_cast<long>(22));
-
-    io_file.close();
-  } else {
-    throw std::runtime_error(std::format("err opening {}", path.string()));
-  }
+std::size_t archie::set_headers<false>() {
+  assert(1 < headers::SizeThreshold);
+  return 1;
 }
