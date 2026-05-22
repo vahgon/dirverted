@@ -8,11 +8,11 @@ namespace archie { class file; }
 
 namespace archie::crc::__init {
 
-constexpr uint32_t gen_poly{ 0xedb88320 };
+static constexpr uint32_t gen_poly{ 0xedb88320 };
 
-constexpr uint32_t init_crc{ 0xffffffff };
+static constexpr uint32_t init_crc{ 0xffffffff };
 
-constexpr std::array<uint32_t, 256> crctable {
+static constexpr std::array<uint32_t, 256> crctable {
   0x00000000, 0x77073096, 0xee0e612c, 0x990951ba,
   0x076dc419, 0x706af48f, 0xe963a535, 0x9e6495a3,
   0x0edb8832, 0x79dcb8a4, 0xe0d5e91e, 0x97d2d988,

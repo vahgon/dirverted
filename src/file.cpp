@@ -1,46 +1,72 @@
 #include "archie/file/file.hpp"
 
-#include <cstring>
+#include <cassert>
+#include <chrono>
+#include <ctime>
+#include <filesystem>
+#include <format>
 #include <fstream>
-#include <stdexcept>
 
-#include "archie/file/crc.hpp"
-#include "archie/converter.hpp"
-#include "archie/headers/lfh.hpp"
+#include "archie/file/headers.hpp"
 
-template<typename T>
-void* write(void*, T&, std::size_t&) noexcept;
+namespace chrono = std::chrono;
 
-void* create_lfh() noexcept;
+std::uint32_t archie::file::mtime() const {
+  auto file_t{ chrono::clock_cast<chrono::system_clock>(
+    std::filesystem::last_write_time(m_path))
+  };
 
-void archie::file::get_filebuf() {
-  std::filebuf io_file;
-  if (!io_file.open(m_path, std::ios::binary | std::ios::in)) {
-    throw std::runtime_error("err");
-  } else {
-    io_file.sgetn(reinterpret_cast<char*>(m_raw_buffer.get()), m_size);
+  auto base_t{ chrono::floor<chrono::days>(file_t) };
+
+  chrono::year_month_day date{ base_t };
+  chrono::hh_mm_ss time{ chrono::floor<chrono::milliseconds>(file_t - base_t) };
+
+  /* MS-DOS fit the 0-59 range for seconds into 5 bits by halving orig. val */
+  std::uint16_t mtime{ static_cast<std::uint16_t>(
+    static_cast<int>(time.hours().count()) << 11  |
+    static_cast<int>(time.minutes().count()) << 5 |
+    static_cast<int>(time.seconds().count()) / 2)
+  };
+
+  // TODO(vahgon): bitmask
+  // TODO(vahgon): year shouldn't be negative...?
+  auto day{ static_cast<unsigned>(date.day()) };
+  auto mon{ static_cast<unsigned>(date.month()) };
+  auto yea{ static_cast<int>(date.year()) };
+
+  std::uint16_t mdate{ static_cast<std::uint16_t>(
+    (static_cast<unsigned>(yea) << 9) | (mon << 5) | day) };
+
+  return static_cast<uint32_t>(mdate << 16) | mtime;
+}
+
+std::uint32_t archie::file::mtime_ext() const noexcept {
+  return 1;
+}
+
+template<>
+std::size_t archie::set_headers<true>(std::size_t size) {
+  assert(size >= headers::SizeThreshold);
+  return size;
+}
+
+template<>
+std::size_t archie::set_headers<false>(std::size_t size) {
+  assert(size < headers::SizeThreshold);
+  return size;
+}
+
+void archie::deserialize_fs_path(const std::filesystem::path& path) {
+  archie::file file{ path };
+  std::filebuf io_file{};
+
+  if (io_file.open(path, std::ios::binary | std::ios::in)) {
+    auto file_buff{ const_cast<std::byte*>(file.buffer_bytes()) };
+
+    io_file.sgetn(reinterpret_cast<char*>(file_buff), static_cast<long>(22));
+
     io_file.close();
+  } else {
+    throw std::runtime_error(std::format("err opening {}", path.string()));
   }
-}
-
-void archie::file::set_file_attrs() {
-  m_crc32 = archie::crc::crc32_lookup(m_raw_buffer.get(), m_size);
-  m_ctime = archie::convert::byte_time(m_path);
-  m_path_str_bytes = static_cast<uint16_t>(m_path_str.size());
-
-  set_lfh_attrs();
-}
-
-void* archie::file::set_lfh_attrs() noexcept {
-
-}
-
-void* create_lfh() noexcept {
-  return malloc(headers::lfh::LFH_SIZE);
-}
-
-template<typename T>
-void* write(void* ptr, T& val, std::size_t& offset) noexcept {
-  offset += sizeof(T);
-  return std::memcpy(ptr, val, sizeof(T));
 }
