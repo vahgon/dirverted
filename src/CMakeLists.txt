@@ -1,7 +1,6 @@
 set(SRC_FILES
   main.cpp
   archie.cpp
-  buffer.cpp
   converter.cpp
   crc.cpp
   file.cpp
