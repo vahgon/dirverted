@@ -23,21 +23,21 @@ std::uint32_t archie::file::mtime() const {
 
   /* MS-DOS fit the 0-59 range for seconds into 5 bits by halving orig. val */
   std::uint16_t mtime{ static_cast<std::uint16_t>(
-    static_cast<int>(time.hours().count()) << 11  |
-    static_cast<int>(time.minutes().count()) << 5 |
-    static_cast<int>(time.seconds().count()) / 2)
+    archie::time_convert<std::int32_t>(time.hours()) << 11  |
+    archie::time_convert<std::int32_t>(time.minutes()) << 5 |
+    archie::time_convert<std::int32_t>(time.seconds()) / 2)
   };
 
-  // TODO(vahgon): bitmask
-  // TODO(vahgon): year shouldn't be negative...?
-  auto day{ static_cast<unsigned>(date.day()) };
-  auto mon{ static_cast<unsigned>(date.month()) };
-  auto yea{ static_cast<int>(date.year()) };
+  auto day{ ((std::uint32_t)date.day()) & 0x1f };
+  auto mon{ ((std::uint32_t)date.month()) &0x0f };
+  /* MS-DOS year epoch is 1980 */
+  auto yea{ ((std::uint32_t)(std::int32_t)date.year() - 1980u) & 0x7f };
 
   std::uint16_t mdate{ static_cast<std::uint16_t>(
-    (static_cast<unsigned>(yea) << 9) | (mon << 5) | day) };
+    (yea << 9) | (mon << 5) | day) };
 
-  return static_cast<uint32_t>(mdate << 16) | mtime;
+  /* 16 bit date and times are combined into one 32 bit num */
+  return static_cast<std::uint32_t>(mdate << 16) | mtime;
 }
 
 std::uint32_t archie::file::mtime_ext() const noexcept {
