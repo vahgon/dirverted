@@ -1,6 +1,7 @@
-/build
-/.cache
-.asm-lsp.toml
+.cache/
+build/
+bin/
+lib/
 .clangd
 compile_commands.json
 Session.vim
