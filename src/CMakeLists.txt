@@ -7,7 +7,9 @@ set_target_properties(archie_lib PROPERTIES
 )
 
 # headers
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(archie_lib PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
 
 # sources
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/archie)
