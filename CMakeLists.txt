@@ -49,7 +49,7 @@ target_compile_features(archie PRIVATE cxx_std_23)
 
 target_compile_options(archie PRIVATE
   -Wall -Wextra -Wpedantic
-  $<$<CONFIG:DEBUG>:-Wconversion -Werror -Wnrvo -g -O0>
+  $<$<CONFIG:DEBUG>:-Wconversion -Wsign-conversion -Werror -Wnrvo -g -O0>
   $<$<CONFIG:RELEASE>:-O3>
 )
 target_link_options(archie PRIVATE
