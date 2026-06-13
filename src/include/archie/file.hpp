@@ -4,6 +4,7 @@
 #include <concepts>
 #include <filesystem>
 #include <string>
+#include <utility>
 
 namespace archie {
 
@@ -12,42 +13,40 @@ enum class HeaderType : std::uint8_t {
 };
 
 class file {
-  using path      = std::filesystem::path;
-  using basic_str = std::basic_string<char>;
-
  public:
   file() = default;
 
+  explicit file(std::filesystem::path const&);
+  explicit file(std::convertible_to<std::string> auto const&);
 
-  file(file const&) = delete;
+  file(file const&) = default;
   file(file&&) noexcept = default;
 
-  explicit file(path const t_path)
-  : m_path { t_path } {};
+  template<typename T>
+    requires std::constructible_from<T, std::string>
+  explicit file(T&& t_path) : m_path{ std::filesystem::path(std::forward(t_path)) } {}
 
-  explicit file(basic_str const t_str)
-  : m_path{ t_str } {};
+  ~file() = default;
 
-  file& operator=(file const&) = delete;
-  file& operator=(file&&) noexcept;
-  file& operator=(basic_str&&);
+  file& operator=(file const&) = default;
+  file& operator=(file&&) noexcept = default;
 
   template<typename T>
-    requires std::same_as<T, std::string>
+    requires std::constructible_from<T, std::string>
   file& operator=(T&& rhs)
   { return *this = file(std::forward(rhs)); }
 
   decltype(auto) operator()(this file&);
   decltype(auto) operator[](this file&, std::size_t);
 
-  friend bool operator==(file const&, file const&);
-  friend bool operator!=(file const&, file const&);
+  bool operator==(file const&) const;
+  bool operator!=(file const&) const;
 
-  friend bool operator<(file const&, file const&);
-  friend bool operator>(file const&, file const&);
+  bool operator<(file const&) const;
+  bool operator>(file const&) const;
 
-  friend bool operator<=(file const&, file const&);
-  friend bool operator>=(file const&, file const&);
+  bool operator<=(file const&) const;
+  bool operator>=(file const&) const;
 
   friend std::ostream& operator<<(std::ostream&, file const&);
   friend std::istream& operator>>(std::istream&, file const&);
@@ -61,11 +60,13 @@ class file {
   std::size_t open();
   std::size_t write();
 
-  // getters
-  path const& filepath() const noexcept { return m_path; }
-  std::size_t size() const noexcept { return m_size; }
+  template<typename... T>
+  decltype(auto) slice(this auto&, std::size_t const, std::size_t const);
 
-  ~file() = default;
+  std::span<std::byte const> read_slice(std::size_t const, std::size_t const) const;
+
+  std::filesystem::path const& filepath() const noexcept { return m_path; }
+  std::size_t size() const noexcept { return m_size; }
 
  private:
   std::filesystem::path m_path{};
