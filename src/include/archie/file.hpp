@@ -3,7 +3,6 @@
 
 #include <concepts>
 #include <filesystem>
-#include <iterator>
 #include <string>
 
 namespace archie {
@@ -11,11 +10,6 @@ namespace archie {
 enum class HeaderType : std::uint8_t {
   LocalFileHeader = 0,
 };
-
-template<typename Iter>
-concept IterSrc =
-  std::input_iterator<Iter> &&
-  std::same_as<std::iter_value_t<Iter>, char>;
 
 class file {
   using path      = std::filesystem::path;
