@@ -78,9 +78,11 @@ inline constexpr std::array<uint32_t, 256> crctable {
   0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d,
 };
 
+class file_handler;
+
 [[noreturn]] uint32_t crc32_intrinsic(std::span<std::byte const>);
 
-[[nodiscard]] uint32_t crc32_lookup(std::span<std::byte const>, std::size_t);
+[[nodiscard]] uint32_t crc32_lookup(std::span<std::byte const>, std::uint32_t&);
 
 }  // namespace archie::crc
 
