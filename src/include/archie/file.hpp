@@ -32,20 +32,33 @@ class file {
   file& operator=(file&&) noexcept;
   file& operator=(basic_str&&);
 
-  template<class T>
-  requires std::constructible_from<path, T>
-  file& operator=(T const& rhs)
-  { return *this = file(rhs); }
+  template<typename T>
+    requires std::same_as<T, std::string>
+  file& operator=(T&& rhs)
+  { return *this = file(std::forward(rhs)); }
 
-  void* create_header(HeaderType const) const;
+  decltype(auto) operator()(this file&);
+  decltype(auto) operator[](this file&, std::size_t);
 
-  // returns num of bytes added
-  std::size_t insert_at(void*, size_t const);
+  friend bool operator==(file const&, file const&);
+  friend bool operator!=(file const&, file const&);
+
+  friend bool operator<(file const&, file const&);
+  friend bool operator>(file const&, file const&);
+
+  friend bool operator<=(file const&, file const&);
+  friend bool operator>=(file const&, file const&);
+
+  friend std::ostream& operator<<(std::ostream&, file const&);
+  friend std::istream& operator>>(std::istream&, file const&);
+
+  void* gen_header(HeaderType const) const;
+
+  std::size_t insert_at(void*, std::size_t const);
   std::size_t prepend(void*);
   std::size_t append(void*);
 
   std::size_t open();
-
   std::size_t write();
 
   // getters
