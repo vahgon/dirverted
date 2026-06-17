@@ -2,6 +2,7 @@
 #define ARCHIE_FILEDATA_HPP_
 
 #include <concepts>
+#include <cstddef>
 #include <filesystem>
 #include <string>
 #include <utility>
@@ -11,6 +12,14 @@ namespace archie {
 enum class HeaderType : std::uint8_t {
   LocalFileHeader = 0,
 };
+
+class file;
+
+template<typename T>
+concept RawFSizeType = std::integral<T> && std::convertible_to<T, std::size_t>;
+
+template<typename T>
+concept FileComparisonTypes = std::same_as<file, T> || RawFSizeType<T>;
 
 class file {
  public:
@@ -39,14 +48,53 @@ class file {
   decltype(auto) operator()(this file&);
   decltype(auto) operator[](this file&, std::size_t);
 
-  bool operator==(file const&) const;
-  bool operator!=(file const&) const;
+  bool operator==(FileComparisonTypes auto const& rhs) const noexcept {
+    if constexpr (std::same_as<decltype(rhs), decltype(this)>) {
+      return this->m_size == rhs.m_size;
+    } else if (RawFSizeType<decltype(rhs)>) {
+      return this->m_size == rhs;
+    }
+  }
 
-  bool operator<(file const&) const;
-  bool operator>(file const&) const;
+  bool operator!=(FileComparisonTypes auto const& rhs) const noexcept {
+    if constexpr (std::same_as<decltype(rhs), decltype(this)>) {
+      return !(this->m_size == rhs.m_size);
+    } else if (RawFSizeType<decltype(rhs)>) {
+      return !(this->m_size == rhs);
+    }
+  }
 
-  bool operator<=(file const&) const;
-  bool operator>=(file const&) const;
+  bool operator<(FileComparisonTypes auto const& rhs) const noexcept {
+    if constexpr (std::same_as<decltype(rhs), decltype(this)>) {
+      return this->m_size < rhs.m_size;
+    } else if (RawFSizeType<decltype(rhs)>) {
+      return this->m_size < rhs;
+    }
+  }
+
+  bool operator>(FileComparisonTypes auto const& rhs) const noexcept {
+    if constexpr (std::same_as<decltype(rhs), decltype(this)>) {
+      return !(this->m_size < rhs.m_size);
+    } else if (RawFSizeType<decltype(rhs)>) {
+      return !(this->m_size < rhs);
+    }
+  }
+
+  bool operator<=(FileComparisonTypes auto const& rhs) const noexcept {
+    if constexpr (std::same_as<decltype(rhs), decltype(this)>) {
+      return this->m_size <= rhs.m_size;
+    } else if (RawFSizeType<decltype(rhs)>) {
+      return this->m_size <= rhs;
+    }
+  }
+
+  bool operator>=(FileComparisonTypes auto const& rhs) const noexcept {
+    if constexpr (std::same_as<decltype(rhs), decltype(this)>) {
+      return !(this->m_size <= rhs.m_size);
+    } else if (RawFSizeType<decltype(rhs)>) {
+      return !(this->m_size <= rhs);
+    }
+  }
 
   friend std::ostream& operator<<(std::ostream&, file const&);
   friend std::istream& operator>>(std::istream&, file const&);
