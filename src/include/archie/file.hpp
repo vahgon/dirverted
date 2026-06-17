@@ -26,7 +26,7 @@ class file {
   file() = default;
 
   explicit file(std::filesystem::path const&);
-  explicit file(std::convertible_to<std::string> auto const&);
+  explicit file(std::string_view const);
 
   file(file const&) = default;
   file(file&&) noexcept = default;
