@@ -90,53 +90,53 @@ decltype(auto) operator=(this auto&& self, auto&& rhs) {
   decltype(auto) operator()(this file&);
   decltype(auto) operator[](this file&, std::size_t);
 
-  bool operator==(FileComparisonTypes auto const& rhs) const noexcept {
-    if constexpr (std::same_as<decltype(rhs), decltype(this)>) {
-      return this->m_size == rhs.m_size;
-    } else if (RawFSizeType<decltype(rhs)>) {
-      return this->m_size == rhs;
-    }
+bool operator==(FileComparisonTypes auto&& rhs) noexcept {
+  if constexpr (requires { rhs.m_size; }) {
+    return this->m_size == rhs.m_size;
+  } else {
+    return this->m_size == rhs;
   }
+}
 
-  bool operator!=(FileComparisonTypes auto const& rhs) const noexcept {
-    if constexpr (std::same_as<decltype(rhs), decltype(this)>) {
-      return !(this->m_size == rhs.m_size);
-    } else if (RawFSizeType<decltype(rhs)>) {
-      return !(this->m_size == rhs);
-    }
+bool operator!=(FileComparisonTypes auto&& rhs) noexcept {
+  if constexpr (requires { rhs.m_size; }) {
+    return !(this->m_size == rhs.m_size);
+  } else {
+    return !(this->m_size == rhs);
   }
+}
 
-  bool operator<(FileComparisonTypes auto const& rhs) const noexcept {
-    if constexpr (std::same_as<decltype(rhs), decltype(this)>) {
-      return this->m_size < rhs.m_size;
-    } else if (RawFSizeType<decltype(rhs)>) {
-      return this->m_size < rhs;
-    }
+bool operator<(FileComparisonTypes auto&& rhs) noexcept {
+  if constexpr (requires { rhs.m_size; }) {
+    return this->m_size < rhs.m_size;
+  } else {
+    return this->m_size < rhs;
   }
+}
 
-  bool operator>(FileComparisonTypes auto const& rhs) const noexcept {
-    if constexpr (std::same_as<decltype(rhs), decltype(this)>) {
-      return !(this->m_size < rhs.m_size);
-    } else if (RawFSizeType<decltype(rhs)>) {
-      return !(this->m_size < rhs);
-    }
+bool operator>(FileComparisonTypes auto&& rhs) noexcept {
+  if constexpr (requires { rhs.m_size; }) {
+    return !(this->m_size < rhs.m_size);
+  } else {
+    return !(this->m_size < rhs);
   }
+}
 
-  bool operator<=(FileComparisonTypes auto const& rhs) const noexcept {
-    if constexpr (std::same_as<decltype(rhs), decltype(this)>) {
-      return this->m_size <= rhs.m_size;
-    } else if (RawFSizeType<decltype(rhs)>) {
-      return this->m_size <= rhs;
-    }
+bool operator<=(FileComparisonTypes auto&& rhs) noexcept {
+  if constexpr (requires { rhs.m_size; }) {
+    return this->m_size <= rhs.m_size;
+  } else {
+    return this->m_size <= rhs;
   }
+}
 
-  bool operator>=(FileComparisonTypes auto const& rhs) const noexcept {
-    if constexpr (std::same_as<decltype(rhs), decltype(this)>) {
-      return !(this->m_size <= rhs.m_size);
-    } else if (RawFSizeType<decltype(rhs)>) {
-      return !(this->m_size <= rhs);
-    }
+bool operator>=(FileComparisonTypes auto&& rhs) noexcept {
+  if constexpr (requires { rhs.m_size; }) {
+    return !(this->m_size <= rhs.m_size);
+  } else {
+    return !(this->m_size <= rhs);
   }
+}
 
   friend std::ostream& operator<<(std::ostream&, file const&);
   friend std::istream& operator>>(std::istream&, file const&);
