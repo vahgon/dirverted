@@ -5,21 +5,47 @@
 #include <cstddef>
 #include <filesystem>
 #include <string>
+#include <type_traits>
 #include <utility>
 
 namespace archie {
 
-enum class HeaderType : std::uint8_t {
-  LocalFileHeader = 0,
-};
+inline constexpr std::size_t Zip64Threshold{ 1024uz * 1024uz * 1024uz };
+inline constexpr std::size_t HeapThreshold{ 1024uz };
+
+template<bool> struct is_zip64    : std::true_type {};
+template<> struct is_zip64<false> : std::false_type {};
+
+template<bool SizeThresh>
+using is_zip64_t = is_zip64<SizeThresh>::type;
+
+template<bool SizeThresh>
+inline constexpr bool is_zip64_v = is_zip64<SizeThresh>::value;
+
+template<std::size_t FSize1, std::size_t FSize2>
+concept IsZip64 = is_zip64_v<(FSize1 > FSize2)>;
 
 class file;
 
 template<typename T>
-concept RawFSizeType = std::integral<T> && std::convertible_to<T, std::size_t>;
+concept RawFSizeType =
+  std::convertible_to<std::remove_cvref_t<T>, std::size_t>;
 
 template<typename T>
-concept FileComparisonTypes = std::same_as<file, T> || RawFSizeType<T>;
+concept RawStdFilesysPath =
+  std::same_as<std::remove_cvref_t<T>, std::filesystem::directory_entry> ||
+  std::same_as<std::remove_cvref_t<T>, std::filesystem::path>;
+
+template<typename T>
+concept FileComparisonTypes =
+  std::same_as<file, std::remove_cvref_t<T> > ||
+  RawFSizeType<T>;
+
+enum class HeaderType : std::uint8_t {
+  LocalFileHeader = 0,
+  CentralDirRecord,
+  EndOfCentralDirRecord,
+};
 
 class file {
  public:
