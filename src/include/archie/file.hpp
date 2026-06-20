@@ -63,13 +63,29 @@ class file {
 
   ~file() = default;
 
-  file& operator=(file const&) = default;
-  file& operator=(file&&) noexcept = default;
+decltype(auto) operator=(this auto&& self, auto&& rhs) {
+  using rhs_type = decltype(rhs);
 
-  template<typename T>
-    requires std::constructible_from<T, std::string>
-  file& operator=(T&& rhs)
-  { return *this = file(std::forward(rhs)); }
+  if constexpr (requires { rhs.m_path; }) {
+    if (self.m_path == rhs.m_path) [[unlikely]] {
+      return self;
+    } else {
+      return self = std::forward<rhs_type>(rhs);
+    }
+  } else if constexpr (std::convertible_to<rhs_type, std::string>) {
+    self.m_path = std::forward<rhs_type>(rhs);
+    self.m_size = std::filesystem::file_size(self.m_path);
+    return self;
+  } else if constexpr (RawStdFilesysPath<rhs_type>) {
+    if (self.m_path == rhs) {
+      return self;
+    } else {
+      return self = std::forward<rhs_type>(rhs);
+    }
+  } else {
+    static_assert(false, "Invalid type used in assignment to archie::file object");
+  }
+}
 
   decltype(auto) operator()(this file&);
   decltype(auto) operator[](this file&, std::size_t);
