@@ -150,13 +150,12 @@ bool operator>=(FileComparisonTypes auto&& rhs) noexcept {
   std::size_t open();
   std::size_t write();
 
-  template<typename... T>
-  decltype(auto) slice(this auto&, std::size_t const, std::size_t const);
+  template<typename Self>
+  decltype(auto) path(this Self&& self) noexcept {
+    return std::forward_like<Self>(self.m_path);
+  }
 
-  std::span<std::byte const> read_slice(std::size_t const, std::size_t const) const;
-
-  std::filesystem::path const& filepath() const noexcept { return m_path; }
-  std::size_t size() const noexcept { return m_size; }
+  std::size_t size() const noexcept { return this->m_size; }
 
  private:
   std::filesystem::path m_path{};
