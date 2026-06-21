@@ -37,9 +37,18 @@ concept RawStdFilesysPath =
   std::same_as<std::remove_cvref_t<T>, std::filesystem::path>;
 
 template<typename T>
+concept StringSrc = std::convertible_to<std::remove_cvref_t<T>, std::string>;
+
+template<typename T>
+concept AcceptedSrcTypes = RawFilesysPathSrc<T> || StringSrc<T>;
+
+template<typename T>
 concept FileComparisonTypes =
   std::same_as<file, std::remove_cvref_t<T> > ||
   RawFSizeType<T>;
+
+template<typename T>
+concept ArchieFileType = std::same_as<T, std::remove_cvref_t<file> >;
 
 enum class HeaderType : std::uint8_t {
   LocalFileHeader = 0,
