@@ -28,11 +28,10 @@ concept IsZip64 = is_zip64_v<(FSize1 > FSize2)>;
 class file;
 
 template<typename T>
-concept RawFSizeType =
-  std::convertible_to<std::remove_cvref_t<T>, std::size_t>;
+concept RawFSizeType = std::convertible_to<std::remove_cvref_t<T>, std::size_t>;
 
 template<typename T>
-concept RawStdFilesysPath =
+concept RawFilesysPathSrc =
   std::same_as<std::remove_cvref_t<T>, std::filesystem::directory_entry> ||
   std::same_as<std::remove_cvref_t<T>, std::filesystem::path>;
 
