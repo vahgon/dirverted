@@ -56,6 +56,12 @@ enum class HeaderType : std::uint8_t {
 };
 
 class file {
+  template<typename Self>
+  using deduced_path_t = std::conditional_t<
+    std::is_rvalue_reference_v<Self&&>,
+    decltype(std::declval<Self>().m_path),
+    decltype(std::forward_like<Self>(std::declval<Self&>().m_path))>;
+
  public:
   file() = default;
 
@@ -159,8 +165,12 @@ bool operator>=(FileComparisonTypes auto&& rhs) noexcept {
   std::size_t write();
 
   template<typename Self>
-  decltype(auto) path(this Self&& self) noexcept {
-    return std::forward_like<Self>(self.m_path);
+  auto path(this Self&& self) -> deduced_path_t<Self&&> {
+    if constexpr (std::is_rvalue_reference_v<decltype(self)>) {
+      return std::remove_cvref_t<decltype(self.m_path)>(std::move(self.m_path));
+    } else {
+      return std::forward_like<Self>(self.m_path);
+    }
   }
 
   std::size_t size() const noexcept { return this->m_size; }
