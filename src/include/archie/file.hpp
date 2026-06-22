@@ -2,16 +2,17 @@
 #define ARCHIE_FILEDATA_HPP_
 
 #include <concepts>
-#include <cstddef>
 #include <filesystem>
-#include <string>
 #include <type_traits>
+#include <string>
 #include <utility>
 
 namespace archie {
 
+class file;
+
 inline constexpr std::size_t Zip64Threshold{ 1024uz * 1024uz * 1024uz };
-inline constexpr std::size_t HeapThreshold{ 1024uz };
+inline constexpr std::size_t StackThreshold{ 1024uz };
 
 template<bool> struct is_zip64    : std::true_type {};
 template<> struct is_zip64<false> : std::false_type {};
@@ -22,13 +23,9 @@ using is_zip64_t = is_zip64<SizeThresh>::type;
 template<bool SizeThresh>
 inline constexpr bool is_zip64_v = is_zip64<SizeThresh>::value;
 
-template<std::size_t FSize1, std::size_t FSize2>
-concept IsZip64 = is_zip64_v<(FSize1 > FSize2)>;
-
-class file;
-
 template<typename T>
-concept RawFSizeType = std::convertible_to<std::remove_cvref_t<T>, std::size_t>;
+concept RawFSizeType =
+  std::convertible_to<std::remove_cvref_t<T>, std::size_t>;
 
 template<typename T>
 concept RawFilesysPathSrc =
@@ -36,10 +33,8 @@ concept RawFilesysPathSrc =
   std::same_as<std::remove_cvref_t<T>, std::filesystem::path>;
 
 template<typename T>
-concept StringSrc = std::convertible_to<std::remove_cvref_t<T>, std::string>;
-
-template<typename T>
-concept AcceptedSrcTypes = RawFilesysPathSrc<T> || StringSrc<T>;
+concept StringSrc =
+  std::convertible_to<std::remove_cvref_t<T>, std::string>;
 
 template<typename T>
 concept FileComparisonTypes =
@@ -47,7 +42,19 @@ concept FileComparisonTypes =
   RawFSizeType<T>;
 
 template<typename T>
-concept ArchieFileType = std::same_as<T, std::remove_cvref_t<file> >;
+concept ArchieFileType =
+  std::same_as<file, std::remove_cvref_t<T> >;
+
+template<typename T>
+concept BaseSrcTypes =
+  (RawFilesysPathSrc<T> || StringSrc<T>) &&
+  !ArchieFileType<T>;
+
+template<typename T>
+using deduced_path_t = std::conditional_t<
+  std::is_rvalue_reference_v<T>,
+  decltype(std::declval<T>().m_path),
+  decltype(std::forward_like<T>(std::declval<T&>().m_path))>;
 
 enum class HeaderType : std::uint8_t {
   LocalFileHeader = 0,
@@ -56,12 +63,6 @@ enum class HeaderType : std::uint8_t {
 };
 
 class file {
-  template<typename Self>
-  using deduced_path_t = std::conditional_t<
-    std::is_rvalue_reference_v<Self&&>,
-    decltype(std::declval<Self>().m_path),
-    decltype(std::forward_like<Self>(std::declval<Self&>().m_path))>;
-
  public:
   file() = default;
 
