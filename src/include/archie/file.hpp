@@ -96,45 +96,55 @@ bool operator==(FileComparisonTypes auto&& rhs) noexcept {
   }
 }
 
-bool operator!=(FileComparisonTypes auto&& rhs) noexcept {
-  if constexpr (requires { rhs.m_size; }) {
-    return !(this->m_size == rhs.m_size);
-  } else {
-    return !(this->m_size == rhs);
-  }
-}
+  ~file() = default;
 
-bool operator<(FileComparisonTypes auto&& rhs) noexcept {
-  if constexpr (requires { rhs.m_size; }) {
-    return this->m_size < rhs.m_size;
-  } else {
-    return this->m_size < rhs;
+  bool operator==(FileComparisonTypes auto&& rhs) noexcept {
+    if constexpr (requires { rhs.m_size; }) {
+      return this->m_size == rhs.m_size;
+    } else {
+      return this->m_size == rhs;
+    }
   }
-}
 
-bool operator>(FileComparisonTypes auto&& rhs) noexcept {
-  if constexpr (requires { rhs.m_size; }) {
-    return !(this->m_size < rhs.m_size);
-  } else {
-    return !(this->m_size < rhs);
+  bool operator!=(FileComparisonTypes auto&& rhs) noexcept {
+    if constexpr (requires { rhs.m_size; }) {
+      return !(this->m_size == rhs.m_size);
+    } else {
+      return !(this->m_size == rhs);
+    }
   }
-}
 
-bool operator<=(FileComparisonTypes auto&& rhs) noexcept {
-  if constexpr (requires { rhs.m_size; }) {
-    return this->m_size <= rhs.m_size;
-  } else {
-    return this->m_size <= rhs;
+  bool operator<(FileComparisonTypes auto&& rhs) noexcept {
+    if constexpr (requires { rhs.m_size; }) {
+      return this->m_size < rhs.m_size;
+    } else {
+      return this->m_size < rhs;
+    }
   }
-}
 
-bool operator>=(FileComparisonTypes auto&& rhs) noexcept {
-  if constexpr (requires { rhs.m_size; }) {
-    return !(this->m_size <= rhs.m_size);
-  } else {
-    return !(this->m_size <= rhs);
+  bool operator>(FileComparisonTypes auto&& rhs) noexcept {
+    if constexpr (requires { rhs.m_size; }) {
+      return !(this->m_size < rhs.m_size);
+    } else {
+      return !(this->m_size < rhs);
+    }
   }
-}
+
+  bool operator<=(FileComparisonTypes auto&& rhs) noexcept {
+    if constexpr (requires { rhs.m_size; }) {
+      return this->m_size <= rhs.m_size;
+    } else {
+      return this->m_size <= rhs;
+    }
+  }
+
+  bool operator>=(FileComparisonTypes auto&& rhs) noexcept {
+    if constexpr (requires { rhs.m_size; }) {
+      return !(this->m_size <= rhs.m_size);
+    } else {
+      return !(this->m_size <= rhs);
+    }
+  }
 
   friend std::ostream& operator<<(std::ostream&, file const&);
   friend std::istream& operator>>(std::istream&, file const&);
@@ -144,9 +154,13 @@ bool operator>=(FileComparisonTypes auto&& rhs) noexcept {
   std::size_t insert_at(void*, std::size_t const);
   std::size_t prepend(void*);
   std::size_t append(void*);
+  bool putsbyte(auto&& byte);
 
   std::size_t open();
-  std::size_t write();
+
+  std::size_t save() const;
+
+  std::size_t size() const noexcept { return this->m_size; }
 
   template<typename Self>
   auto path(this Self&& self) -> deduced_path_t<Self&&> {
@@ -156,8 +170,6 @@ bool operator>=(FileComparisonTypes auto&& rhs) noexcept {
       return std::forward_like<Self>(self.m_path);
     }
   }
-
-  std::size_t size() const noexcept { return this->m_size; }
 
  private:
   std::filesystem::path m_path{};
