@@ -7,11 +7,11 @@
 
 namespace archie::crc {
 
-inline constexpr uint32_t gen_poly{ 0xedb88320 };
+inline constexpr std::uint32_t gen_poly{ 0xedb88320 };
 
-inline constexpr uint32_t init_crc{ 0xffffffff };
+inline constexpr std::uint32_t init_crc{ 0xffffffff };
 
-inline constexpr std::array<uint32_t, 256> crctable {
+inline constexpr std::array<std::uint32_t, 256> crctable {
   0x00000000, 0x77073096, 0xee0e612c, 0x990951ba,
   0x076dc419, 0x706af48f, 0xe963a535, 0x9e6495a3,
   0x0edb8832, 0x79dcb8a4, 0xe0d5e91e, 0x97d2d988,
@@ -78,11 +78,9 @@ inline constexpr std::array<uint32_t, 256> crctable {
   0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d,
 };
 
-class file_handler;
+[[noreturn]] std::uint32_t crc32_intrinsic(std::span<std::byte const>);
 
-[[noreturn]] uint32_t crc32_intrinsic(std::span<std::byte const>);
-
-[[nodiscard]] uint32_t crc32_lookup(std::span<std::byte const>, std::uint32_t&);
+[[nodiscard]] std::uint32_t crc32_lookup(std::span<std::byte const>, std::uint32_t&);
 
 }  // namespace archie::crc
 
