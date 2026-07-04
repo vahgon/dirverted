@@ -1,5 +1,5 @@
-#ifndef ARCHIE_FILE_CRC_HPP_
-#define ARCHIE_FILE_CRC_HPP_
+#ifndef SRC_METADATA_HPP_
+#define SRC_METADATA_HPP_
 
 #include <array>
 #include <cstdint>
@@ -84,4 +84,4 @@ inline constexpr std::array<std::uint32_t, 256> crctable {
 
 }  // namespace archie::crc
 
-#endif  // ARCHIE_FILE_CRC_HPP_
+#endif  // SRC_METADATA_HPP_

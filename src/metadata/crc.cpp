@@ -1,4 +1,4 @@
-#include "archie/internal/crc.hpp"
+#include "metadata/crc.hpp"
 
 #ifndef USE_IMMINTRIN
 #include <immintrin.h>
