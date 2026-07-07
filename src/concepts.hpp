@@ -1,5 +1,5 @@
-#ifndef SRC_CORE_CONCEPTS_HPP_
-#define SRC_CORE_CONCEPTS_HPP_
+#ifndef SRC_CONCEPTS_HPP_
+#define SRC_CONCEPTS_HPP_
 
 #include <concepts>
 #include <filesystem>
@@ -48,4 +48,4 @@ concept ArchieFileSrcType =
 
 }  // namespace archie::concepts
 
-#endif  // SRC_CORE_CONCEPTS_HPP_
+#endif  // SRC_CONCEPTS_HPP_

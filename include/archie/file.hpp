@@ -6,7 +6,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "core/concepts.hpp"
+#include "concepts.hpp"
 
 namespace archie {
 
