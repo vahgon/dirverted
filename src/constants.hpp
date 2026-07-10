@@ -1,8 +1,6 @@
 #ifndef SRC_CONSTANTS_HPP_
 #define SRC_CONSTANTS_HPP_
 
-namespace test {
-
 #include <linux/limits.h>
 #if __linux__
 #include <limits.h>
@@ -10,7 +8,8 @@ namespace test {
 #include <windows.h>
 #endif
 
-}
+#include <cstdint>
+
 namespace constants {
 
 #if __linux__
