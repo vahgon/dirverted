@@ -26,6 +26,9 @@ inline constexpr int MaxPathStr = MAX_PATH;
 inline constexpr wchar_t PreferredSeparator = L'\\';
 #endif
 
+inline constexpr std::uint16_t ZipVersion{ 10 };
+inline constexpr std::uint16_t Zip64Version{ 10 };
+
 }  // namespace constants;
 
 #endif  // SRC_CONSTANTS_HPP_
