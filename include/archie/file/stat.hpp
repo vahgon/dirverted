@@ -51,7 +51,195 @@ inline int stat(T in, StatType& st) noexcept {
 }
 
 #ifdef STATX_TYPE
-// TODO: getters
+template<typename T, typename StatType>
+  requires file::concepts::path_or_fd<T> && file::concepts::is_statx<StatType>
+inline int set_stx_type(T in, int flags, StatType& st) noexcept {
+  if constexpr (std::same_as<std::remove_cvref_t<T>, char const*>) {
+    return !::statx(AT_FDCWD, in, flags, STATX_TYPE, __builtin_addressof(st));
+  } else {
+    return !::statx(in, nullptr, flags, STATX_TYPE, __builtin_addressof(st));
+  }
+}
+
+template<typename T, typename StatType>
+  requires file::concepts::path_or_fd<T> && file::concepts::is_statx<StatType>
+inline int set_stx_mode(T in, int flags, StatType& st) noexcept {
+  if constexpr (std::same_as<std::remove_cvref_t<T>, char const*>) {
+    return !::statx(AT_FDCWD, in, flags, STATX_MODE, __builtin_addressof(st));
+  } else {
+    return !::statx(in, nullptr, flags, STATX_MODE, __builtin_addressof(st));
+  }
+}
+
+template<typename T, typename StatType>
+  requires file::concepts::path_or_fd<T> && file::concepts::is_statx<StatType>
+inline int set_stx_nlink(T in, int flags, StatType& st) noexcept {
+  if constexpr (std::same_as<std::remove_cvref_t<T>, char const*>) {
+    return !::statx(AT_FDCWD, in, flags, STATX_NLINK, __builtin_addressof(st));
+  } else {
+    return !::statx(in, nullptr, flags, STATX_NLINK, __builtin_addressof(st));
+  }
+}
+
+template<typename T, typename StatType>
+  requires file::concepts::path_or_fd<T> && file::concepts::is_statx<StatType>
+inline int set_statx_uid(T in, int flags, StatType& st) noexcept {
+  if constexpr (std::same_as<std::remove_cvref_t<T>, char const*>) {
+    return !::statx(AT_FDCWD, in, flags, STATX_UID, __builtin_addressof(st));
+  } else {
+    return !::statx(in, nullptr, flags, STATX_UID, __builtin_addressof(st));
+  }
+}
+
+template<typename T, typename StatType>
+  requires file::concepts::path_or_fd<T> && file::concepts::is_statx<StatType>
+inline int set_statx_gid(T in, int flags, StatType& st) noexcept {
+  if constexpr (std::same_as<std::remove_cvref_t<T>, char const*>) {
+    return !::statx(AT_FDCWD, in, flags, STATX_GID, __builtin_addressof(st));
+  } else {
+    return !::statx(in, nullptr, flags, STATX_GID, __builtin_addressof(st));
+  }
+}
+
+template<typename T, typename StatType>
+  requires file::concepts::path_or_fd<T> && file::concepts::is_statx<StatType>
+inline int set_statx_atime(T in, int flags, StatType& st) noexcept {
+  if constexpr (std::same_as<std::remove_cvref_t<T>, char const*>) {
+    return !::statx(AT_FDCWD, in, flags, STATX_ATIME, __builtin_addressof(st));
+  } else {
+    return !::statx(in, nullptr, flags, STATX_ATIME, __builtin_addressof(st));
+  }
+}
+
+template<typename T, typename StatType>
+  requires file::concepts::path_or_fd<T> && file::concepts::is_statx<StatType>
+inline int set_statx_mtime(T in, int flags, StatType& st) noexcept {
+  if constexpr (std::same_as<std::remove_cvref_t<T>, char const*>) {
+    return !::statx(AT_FDCWD, in, flags, STATX_MTIME, __builtin_addressof(st));
+  } else {
+    return !::statx(in, nullptr, flags, STATX_MTIME, __builtin_addressof(st));
+  }
+}
+
+template<typename T, typename StatType>
+  requires file::concepts::path_or_fd<T> && file::concepts::is_statx<StatType>
+inline int set_statx_ctime(T in, int flags, StatType& st) noexcept {
+  if constexpr (std::same_as<std::remove_cvref_t<T>, char const*>) {
+    return !::statx(AT_FDCWD, in, flags, STATX_CTIME, __builtin_addressof(st));
+  } else {
+    return !::statx(in, nullptr, flags, STATX_CTIME, __builtin_addressof(st));
+  }
+}
+
+template<typename T, typename StatType>
+  requires file::concepts::path_or_fd<T> && file::concepts::is_statx<StatType>
+inline int set_statx_ino(T in, int flags, StatType& st) noexcept {
+  if constexpr (std::same_as<std::remove_cvref_t<T>, char const*>) {
+    return !::statx(AT_FDCWD, in, flags, STATX_INO, __builtin_addressof(st));
+  } else {
+    return !::statx(in, nullptr, flags, STATX_INO, __builtin_addressof(st));
+  }
+}
+
+template<typename T, typename StatType>
+  requires file::concepts::path_or_fd<T> && file::concepts::is_statx<StatType>
+inline int set_statx_size(T in, int flags, StatType& st) noexcept {
+  if constexpr (std::same_as<std::remove_cvref_t<T>, char const*>) {
+    return !::statx(AT_FDCWD, in, flags, STATX_SIZE, __builtin_addressof(st));
+  } else {
+    return !::statx(in, nullptr, flags, STATX_SIZE, __builtin_addressof(st));
+  }
+}
+
+template<typename T, typename StatType>
+  requires file::concepts::path_or_fd<T> && file::concepts::is_statx<StatType>
+inline int set_statx_blocks(T in, int flags, StatType& st) noexcept {
+  if constexpr (std::same_as<std::remove_cvref_t<T>, char const*>) {
+    return !::statx(AT_FDCWD, in, flags, STATX_BLOCKS, __builtin_addressof(st));
+  } else {
+    return !::statx(in, nullptr, flags, STATX_BLOCKS, __builtin_addressof(st));
+  }
+}
+
+template<typename T, typename StatType>
+  requires file::concepts::path_or_fd<T> && file::concepts::is_statx<StatType>
+inline int set_statx_basic_stats(T in, int flags, StatType& st) noexcept {
+  if constexpr (std::same_as<std::remove_cvref_t<T>, char const*>) {
+    return !::statx(AT_FDCWD, in, flags, STATX_BASIC_STATS, __builtin_addressof(st));
+  } else {
+    return !::statx(in, nullptr, flags, STATX_BASIC_STATS, __builtin_addressof(st));
+  }
+}
+
+template<typename T, typename StatType>
+  requires file::concepts::path_or_fd<T> && file::concepts::is_statx<StatType>
+inline int set_statx_btime(T in, int flags, StatType& st) noexcept {
+  if constexpr (std::same_as<std::remove_cvref_t<T>, char const*>) {
+    return !::statx(AT_FDCWD, in, flags, STATX_BTIME, __builtin_addressof(st));
+  } else {
+    return !::statx(in, nullptr, flags, STATX_BTIME, __builtin_addressof(st));
+  }
+}
+
+template<typename T, typename StatType>
+  requires file::concepts::path_or_fd<T> && file::concepts::is_statx<StatType>
+inline int set_statx_all(T in, int flags, StatType& st) noexcept {
+  if constexpr (std::same_as<std::remove_cvref_t<T>, char const*>) {
+    return !::statx(AT_FDCWD, in, flags, (STATX_BASIC_STATS | STATX_BTIME), __builtin_addressof(st));
+  } else {
+    return !::statx(in, nullptr, flags, (STATX_BASIC_STATS | STATX_BTIME), __builtin_addressof(st));
+  }
+}
+
+template<typename T, typename StatType >
+  requires file::concepts::path_or_fd<T> && file::concepts::is_statx<StatType>
+inline int set_statx_mnt_id(T in, int flags, StatType& st) noexcept {
+  if constexpr (std::same_as<std::remove_cvref_t<T>, char const*>) {
+    return !::statx(AT_FDCWD, in, flags, STATX_MNT_ID, __builtin_addressof(st));
+  } else {
+    return !::statx(in, nullptr, flags, STATX_MNT_ID, __builtin_addressof(st));
+  }
+}
+
+template<typename T, typename StatType>
+  requires file::concepts::path_or_fd<T> && file::concepts::is_statx<StatType>
+inline int set_statx_mnt_id_unique(T in, int flags, StatType& st) noexcept {
+  if constexpr (std::same_as<std::remove_cvref_t<T>, char const*>) {
+    return !::statx(AT_FDCWD, in, flags, STATX_MNT_ID_UNIQUE, __builtin_addressof(st));
+  } else {
+    return !::statx(in, nullptr, flags, STATX_MNT_ID_UNIQUE, __builtin_addressof(st));
+  }
+}
+
+template<typename T, typename StatType>
+  requires file::concepts::path_or_fd<T> && file::concepts::is_statx<StatType>
+inline int set_statx_subvol(T in, int flags, StatType& st) noexcept {
+  if constexpr (std::same_as<std::remove_cvref_t<T>, char const*>) {
+    return !::statx(AT_FDCWD, in, flags, STATX_SUBVOL, __builtin_addressof(st));
+  } else {
+    return !::statx(in, nullptr, flags, STATX_SUBVOL, __builtin_addressof(st));
+  }
+}
+
+template<typename T, typename StatType>
+  requires file::concepts::path_or_fd<T> && file::concepts::is_statx<StatType>
+inline int set_statx_write_atomic(T in, int flags, StatType& st) noexcept {
+  if constexpr (std::same_as<std::remove_cvref_t<T>, char const*>) {
+    return !::statx(AT_FDCWD, in, flags, STATX_WRITE_ATOMIC, __builtin_addressof(st));
+  } else {
+    return !::statx(in, nullptr, flags, STATX_WRITE_ATOMIC, __builtin_addressof(st));
+  }
+}
+
+template<typename T, typename StatType>
+  requires file::concepts::path_or_fd<T> && file::concepts::is_statx<StatType>
+inline int set_statx_dio_read_align(T in, int flags, StatType& st) noexcept {
+  if constexpr (std::same_as<std::remove_cvref_t<T>, char const*>) {
+    return !::statx(AT_FDCWD, in, flags, STATX_DIO_READ_ALIGN, __builtin_addressof(st));
+  } else {
+    return !::statx(in, nullptr, flags, STATX_DIO_READ_ALIGN, __builtin_addressof(st));
+  }
+}
 #endif
 
 template<typename StatType>
