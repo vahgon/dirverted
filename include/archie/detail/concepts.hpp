@@ -1,13 +1,17 @@
 #pragma once
 
-#include <fcntl.h>
+#ifdef __linux__
+# include <limits.h>
+#elifdef _WIN32
+# include <windows.h>
+#endif
 
 #include <concepts>
 #include <type_traits>
 
 #include <archie/detail/types.hpp>
 
-namespace archie::detail {
+namespace archie::concepts {
 
 template<typename T>
 concept is_char_t =
@@ -25,20 +29,42 @@ concept is_path_t =
 
 }  // namespace archie::detail
 
-namespace archie::path::concepts {
+namespace archie::concepts {
 
 template<typename T>
 concept path_char =
-  detail::is_char_t<T> ||
-  detail::is_wchar_t<T>;
+  concepts::is_char_t<T> ||
+  concepts::is_wchar_t<T>;
 
-}  // namespace archie::path::concepts
+#if __linux__
+inline constexpr int  MaxPathStr     = PATH_MAX;
+inline constexpr char path_separator = '/';
+#elif _WIN32
+inline constexpr int  MaxPathStr     = MAX_PATH;
+inline constexpr char path_separator = '/' || '\\';
+#endif
 
-namespace archie::file::concepts {
+constexpr bool is_path_separator(path_char auto const c) noexcept {
+  if constexpr (concepts::is_char_t<decltype(c)>) {
+    return c == path_separator;
+  } else if constexpr (concepts::is_wchar_t<decltype(c)>) {
+    return c == L'/' || c == L'\\';
+  }
+}
+
+}  // namespace archie::concepts::path
+
+namespace archie::concepts::file {
+
+#ifdef __linux__
+inline constexpr int MaxFileStr = NAME_MAX;
+#elifdef _WIN32
+inline constexpr int MaxFileStr = NAME_MAX;
+#endif
 
 template<typename T>
 concept path_or_fd =
-  detail::is_path_t<T> ||
+  concepts::is_path_t<T> ||
   std::same_as<std::remove_cvref_t<T>, int>;
 
 template<typename T>
@@ -54,4 +80,4 @@ template<typename T>
 concept is_stat =
   stat_supported<T> && T::is_stat;
 
-}  // namespace archie::file::concepts
+}  // namespace archie::concepts::file
