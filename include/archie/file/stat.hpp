@@ -1,15 +1,14 @@
 #pragma once
 
 #include <fcntl.h>
-#include <linux/stat.h>
 #include <sys/stat.h>
 
 #include <concepts>
 #include <cstdint>
+#include <type_traits>
 
 #include <archie/detail/concepts.hpp>
 #include <archie/detail/types.hpp>
-#include <type_traits>
 
 namespace archie::stat {
 
@@ -32,6 +31,7 @@ inline int stat(int fd, char const* path, int flags, uint32_t mask, StatType& st
   return ::statx(fd, path, flags, mask, __builtin_addressof(st));
 }
 #endif
+
 template<typename T, typename StatType>
   requires file::concepts::path_or_fd<T> && file::concepts::stat_supported<StatType>
 inline int stat(T in, StatType& st) noexcept {
