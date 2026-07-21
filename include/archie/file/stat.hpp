@@ -10,7 +10,7 @@
 #include <archie/detail/concepts.hpp>
 #include <archie/detail/types.hpp>
 
-namespace archie::stat {
+namespace archie {
 
 #ifdef __linux__
 
@@ -314,4 +314,4 @@ inline bool is_fifo(StatType const& st) noexcept {
 
 #endif
 
-}  // namespace archie::stat
+}  // namespace archie
