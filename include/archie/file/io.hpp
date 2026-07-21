@@ -9,7 +9,6 @@
 #include <cstdlib>
 #include <memory>
 #include <type_traits>
-#include <utility>
 
 #include <archie/detail/concepts.hpp>
 #include <archie/file/flags.hpp>
