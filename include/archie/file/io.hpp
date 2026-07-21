@@ -64,7 +64,7 @@ inline auto multi_name_to_handle_at(int flags, Ts... ins) noexcept(noexcept(type
   };
 
   auto open_handle = [flags](concepts::file::path_or_fd auto& in) -> file_handle_inf {
-    auto info = file_handle_inf{ std::make_unique<type::file_handle_t>(1), 0 };
+    auto info = file_handle_inf{ std::make_unique<type::file_handle_t>(1), 0 , true };
     info.err = !!archie::io::name_to_handle_at(in, *info.file_handle, info.mount_id, flags);
     return info;
   };
