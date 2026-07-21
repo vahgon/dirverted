@@ -57,21 +57,47 @@ inline int open_by_handle_at(int mnt_fd, type::file_handle_t* fh, int flags) noe
 
 template<typename... Ts>
   requires (sizeof...(Ts) >= 1) && (concepts::file::path_or_fd<Ts> && ...)
-inline auto multi_name_to_handle_at(int flags, Ts... ins) {
-  struct file_handle_info {
-    std::unique_ptr<type::file_handle_t> file_handle;
-    int  mount_id;
-    bool err;
+inline auto multi_name_to_handle_at(int flags, Ts... ins) noexcept {
+  using fh_t     = archie::type::file_handle_t;
+  using fh_ptr_t = std::unique_ptr<fh_t, decltype([](void* ptr) { std::free(ptr); })>;
+
+  struct file_handle_struct {
+    fh_ptr_t file_handle;
+    int      mount_id;
+
+    explicit operator bool() const { return file_handle != nullptr; }
   };
 
-  auto open_handle = [flags](auto in) -> file_handle_info {
-    auto info = file_handle_info{ std::make_unique<type::file_handle_t>(1), 0 , true };
-    info.err = !!archie::io::name_to_handle_at(in, *info.file_handle, info.mount_id, flags);
-    return info;
+  auto open_handle = [flags](auto in) -> file_handle_struct {
+    fh_t* fh_ptr_tmp{ static_cast<fh_t*>(std::malloc(sizeof(fh_t))) };
+    int   mnt_id{};
+
+    fh_ptr_tmp->handle_bytes = 0;
+
+    // if name_to_handle_at succeeds (returns !0) or errno is not set to EOVERFLOW
+    if (archie::io::name_to_handle_at(in, fh_ptr_tmp, mnt_id, flags) || errno != EOVERFLOW) {
+      std::free(fh_ptr_tmp);
+      return file_handle_struct{ nullptr, mnt_id };
+    }
+
+    size_t fh_bytes = sizeof(fh_t) + fh_ptr_tmp->handle_bytes;
+    fh_t* fh_ptr;
+
+    if (!(fh_ptr = static_cast<fh_t*>(std::realloc(fh_ptr_tmp, fh_bytes)))) {
+      std::free(fh_ptr_tmp);
+      return file_handle_struct{ nullptr, mnt_id };
+    }
+
+    // if name_to_handle_at FAILS (returns !-1)
+    if (!archie::io::name_to_handle_at(in, fh_ptr, mnt_id, flags)) {
+      std::free(fh_ptr);
+      return file_handle_struct{ nullptr, mnt_id };
+    } else {
+      return file_handle_struct{ fh_ptr_t(fh_ptr), mnt_id };
+    }
   };
 
-  std::array<file_handle_info, sizeof...(Ts)> file_handles{ open_handle(ins)... };
-  return file_handles;
+  return std::array<file_handle_struct, sizeof...(Ts)>{ open_handle(ins)... };
 }
 
 }  // namespace archie::io
