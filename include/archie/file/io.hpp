@@ -69,7 +69,7 @@ inline auto multi_name_to_handle_at(int flags, Ts... ins) noexcept(noexcept(type
     return info;
   };
 
-  std::array<file_handle_inf, sizeof...(ins)> file_handles{ (...,(open_handle(ins))) };
+  std::array<file_handle_inf, sizeof...(ins)> file_handles{ open_handle(ins)... };
   return file_handles;
 }
 
