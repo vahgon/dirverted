@@ -55,7 +55,7 @@ inline int open_by_handle_at(int mnt_fd, type::file_handle_t& fh, int flags) noe
 }
 
 template<typename... Ts>
-  requires (sizeof...(Ts) >= 1) && (..., concepts::file::path_or_fd<Ts>)
+  requires (sizeof...(Ts) >= 1) && (concepts::file::path_or_fd<Ts> && ...)
 inline auto multi_name_to_handle_at(int flags, Ts... ins) noexcept(noexcept(type::file_handle_t{})) {
   struct file_handle_inf {
     std::unique_ptr<type::file_handle_t> file_handle;
@@ -63,7 +63,7 @@ inline auto multi_name_to_handle_at(int flags, Ts... ins) noexcept(noexcept(type
     bool err;
   };
 
-  auto open_handle = [flags](concepts::file::path_or_fd auto& in) -> file_handle_inf {
+  auto open_handle = [flags](auto& in) -> file_handle_inf {
     auto info = file_handle_inf{ std::make_unique<type::file_handle_t>(1), 0 , true };
     info.err = !!archie::io::name_to_handle_at(in, *info.file_handle, info.mount_id, flags);
     return info;
