@@ -69,13 +69,20 @@ inline auto multi_name_to_handle_at(int flags, Ts... ins) noexcept {
   };
 
   auto open_handle = [flags](auto in) -> file_handle_struct {
-    fh_t* fh_ptr_tmp{ static_cast<fh_t*>(std::malloc(sizeof(fh_t))) };
-    int   mnt_id{};
+    fh_t* fh_ptr_tmp{};
+    int mnt_id{};
 
-    fh_ptr_tmp->handle_bytes = 0;
+    if (!(fh_ptr_tmp = static_cast<fh_t*>(std::malloc(sizeof(fh_t))))) {
+      return file_handle_struct{ nullptr, mnt_id };
+    }
+
+    fh_ptr_tmp->handle_bytes = 0u;
 
     // if name_to_handle_at returns true (!0) or errno is not set to EOVERFLOW
     if (archie::io::name_to_handle_at(in, fh_ptr_tmp, mnt_id, flags) || errno != EOVERFLOW) {
+      std::free(fh_ptr_tmp);
+      return file_handle_struct{ nullptr, mnt_id };
+    } else if (fh_ptr_tmp->handle_bytes == 0u && errno == EOVERFLOW) {  // no change to handle_bytes means no file found
       std::free(fh_ptr_tmp);
       return file_handle_struct{ nullptr, mnt_id };
     }
