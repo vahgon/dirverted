@@ -62,10 +62,10 @@ inline auto multi_name_to_handle_at(int flags, Ts... ins) noexcept {
   using fh_ptr_t = std::unique_ptr<fh_t, decltype([](void* ptr) { std::free(ptr); })>;
 
   struct file_handle_struct {
-    fh_ptr_t file_handle;
-    int      mount_id;
+    fh_ptr_t file_handle{};
+    int      mount_id{};
 
-    explicit operator bool() const { return file_handle != nullptr; }
+    explicit operator bool() const noexcept { return file_handle != nullptr; }
   };
 
   auto open_handle = [flags](auto in) -> file_handle_struct {
@@ -74,7 +74,7 @@ inline auto multi_name_to_handle_at(int flags, Ts... ins) noexcept {
 
     fh_ptr_tmp->handle_bytes = 0;
 
-    // if name_to_handle_at succeeds (returns !0) or errno is not set to EOVERFLOW
+    // if name_to_handle_at returns true (!0) or errno is not set to EOVERFLOW
     if (archie::io::name_to_handle_at(in, fh_ptr_tmp, mnt_id, flags) || errno != EOVERFLOW) {
       std::free(fh_ptr_tmp);
       return file_handle_struct{ nullptr, mnt_id };
@@ -88,7 +88,7 @@ inline auto multi_name_to_handle_at(int flags, Ts... ins) noexcept {
       return file_handle_struct{ nullptr, mnt_id };
     }
 
-    // if name_to_handle_at FAILS (returns !-1)
+    // if name_to_handle_at returns false (!-1)
     if (!archie::io::name_to_handle_at(in, fh_ptr, mnt_id, flags)) {
       std::free(fh_ptr);
       return file_handle_struct{ nullptr, mnt_id };
