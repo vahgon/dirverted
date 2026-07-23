@@ -3,7 +3,7 @@
 # -------------------------------------------------
 cmake_minimum_required(VERSION 3.12)
 project(
-  Archie 
+  Archie
   DESCRIPTION ""
   LANGUAGES CXX
 )
@@ -34,23 +34,19 @@ if(DOCUMENTATION)
 endif()
 
 # create lib
-add_library(archie_lib STATIC)
+add_library(archie_lib INTERFACE)
 
 set_target_properties(archie_lib PROPERTIES
   CMAKE_CXX_STANDARD_REQUIRED TRUE
   CMAKE_CXX_EXTENSIONS FALSE
 )
 
-add_subdirectory(${CMAKE_SOURCE_DIR}/src)
-
 target_include_directories(archie_lib
-  PUBLIC
+  INTERFACE
     ${CMAKE_SOURCE_DIR}/include
-  PRIVATE
-    ${CMAKE_SOURCE_DIR}/src
 )
 
-target_compile_features(archie_lib PRIVATE cxx_std_23)
+target_compile_features(archie_lib INTERFACE cxx_std_23)
 
 # compile example
 if(EXAMPLE)
