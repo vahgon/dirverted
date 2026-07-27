@@ -36,21 +36,39 @@ DIR* fdiropen(int) noexcept;
 
 namespace dvrt::detail {
 
-struct fd {
+struct fd_base {
+ public:
+  fd_base() noexcept = default;
+
+  explicit fd_base(int t_fd) noexcept
+  : m_fd{ t_fd } {}
+
+  explicit operator bool(this fd_base) noexcept;
+
+  explicit operator int(this fd_base) noexcept;
+
+ public:
+  [[nodiscard]] int raw(this fd_base) noexcept;
+
+ protected:
+  int m_fd{ io::InvalidFileDesc };
+};
+
+struct fd final : public fd_base {
  public:
   fd() noexcept = default;
 
   explicit fd(char const* path) noexcept
-  : m_fd{ io::open(path) } {}
+  : fd_base{ io::open(path) } {}
 
   explicit fd(int t_fd) noexcept
-  : m_fd{ t_fd } {}
+  : fd_base{ t_fd } {}
 
   fd(fd const& rhs) noexcept
-  : m_fd{ io::duplicate_fd(rhs.m_fd) } {}
+  : fd_base{ io::duplicate_fd(rhs.m_fd) } {}
 
   fd(fd&& rhs) noexcept
-  : m_fd{ rhs.release() } {}
+  : fd_base{ rhs.release() } {}
 
   ~fd() { if (m_fd != io::InvalidFileDesc) io::close(m_fd); };
 
@@ -63,17 +81,8 @@ struct fd {
 
   fd& operator=(char const*) noexcept;
 
-  explicit operator bool() const noexcept;
-
-  explicit operator int() const noexcept;
-
  public:
-  [[nodiscard]] int raw() const noexcept { return m_fd; }
-
   [[nodiscard]] int release() noexcept;
-
- private:
-  int m_fd{ io::InvalidFileDesc };
 };
 
 }  // namespace dvrt::detail

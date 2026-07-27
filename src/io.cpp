@@ -7,10 +7,9 @@
 #elifdef _WIN32
 #endif
 
-#include <fcntl.h>
-
-namespace io = dvrt::detail::io;
-using     fd = dvrt::detail::fd;
+namespace io      = dvrt::detail::io;
+using     fd      = dvrt::detail::fd;
+using     fd_base = dvrt::detail::fd_base;
 
 #ifdef __linux__
 int io::open(char const* path) noexcept {
@@ -54,6 +53,18 @@ int io::duplicate_fd(int fd_orig, int fd_doner) noexcept {
 int io::open(wchar_t const* path, int flags) noexcept;
 #endif
 
+fd_base::operator bool(this fd_base self) noexcept {
+  return self.m_fd != io::InvalidFileDesc;
+}
+
+fd_base::operator int(this fd_base self) noexcept {
+  return self.m_fd;
+}
+
+int fd_base::raw(this fd_base self) noexcept {
+  return self.m_fd;
+}
+
 fd& fd::operator=(fd const& rhs) noexcept {
   if (*this && rhs) {
     if (m_fd != rhs.m_fd) {
@@ -83,14 +94,6 @@ fd& fd::operator=(char const* path) noexcept {
   if (m_fd != io::InvalidFileDesc) io::close(m_fd);
   m_fd = io::open(path);
   return *this;
-}
-
-fd::operator bool() const noexcept {
-  return m_fd != io::InvalidFileDesc;
-}
-
-fd::operator int() const noexcept {
-  return m_fd;
 }
 
 int fd::release() noexcept {
