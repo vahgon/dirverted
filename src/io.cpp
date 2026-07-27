@@ -97,7 +97,7 @@ fd& fd::operator=(char const* path) noexcept {
 }
 
 int fd::release() noexcept {
-  int tmp = m_fd;
+  int released_fd = m_fd;
   m_fd = io::InvalidFileDesc;
-  return m_fd;
+  return released_fd;
 }
