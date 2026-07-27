@@ -33,17 +33,17 @@ int io::close(int fd) noexcept {
   return !::close(fd);
 }
 
-int io::duplicate_fd(int fd_prime) noexcept {
-  if (int fd_cloned{}; (fd_cloned = ::fcntl(fd_prime, F_DUPFD_CLOEXEC, 0)) != io::InvalidFileDesc) {
-    return fd_cloned;
+int io::duplicate_fd(int fd_doner) noexcept {
+  if (int dupe_fd{}; (dupe_fd = ::fcntl(fd_doner, F_DUPFD_CLOEXEC, 0)) != io::InvalidFileDesc) {
+    return dupe_fd;
   } else {
     return io::InvalidFileDesc;
   }
 }
 
 int io::duplicate_fd(int fd_orig, int fd_doner) noexcept {
-  if (int duped_fd{}; (duped_fd = ::dup3(fd_doner, fd_orig, O_CLOEXEC)) != io::InvalidFileDesc) {
-    return duped_fd;
+  if (int dupe_fd{}; (dupe_fd = ::dup3(fd_doner, fd_orig, O_CLOEXEC)) != io::InvalidFileDesc) {
+    return dupe_fd;
   } else {
     return io::InvalidFileDesc;
   }
