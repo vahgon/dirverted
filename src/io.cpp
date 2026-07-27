@@ -1,6 +1,7 @@
 #include "io.hpp"
 
 #ifdef __linux__
+# include <fcntl.h>
 # include <syscall.h>
 # include <unistd.h>
 #elifdef _WIN32
@@ -33,18 +34,20 @@ int io::close(int fd) noexcept {
   return !::close(fd);
 }
 
-int io::duplicate_fd(int newfd) noexcept {
-  if (int duped_fd{}; (duped_fd = ::dup3(io::InvalidFileDesc, newfd, O_CLOEXEC)) != -1) {
-    return duped_fd;
+int io::duplicate_fd(int fd_prime) noexcept {
+  if (int fd_cloned{}; (fd_cloned = ::fcntl(fd_prime, F_DUPFD_CLOEXEC, 0)) != io::InvalidFileDesc) {
+    return fd_cloned;
+  } else {
+    return io::InvalidFileDesc;
   }
-  return io::InvalidFileDesc;
 }
 
-int io::duplicate_fd(int oldfd, int newfd) noexcept {
-  if (int duped_fd{}; (duped_fd = ::dup3(oldfd, newfd, O_CLOEXEC)) != -1) {
+int io::duplicate_fd(int fd_orig, int fd_doner) noexcept {
+  if (int duped_fd{}; (duped_fd = ::dup3(fd_doner, fd_orig, O_CLOEXEC)) != io::InvalidFileDesc) {
     return duped_fd;
+  } else {
+    return io::InvalidFileDesc;
   }
-  return io::InvalidFileDesc;
 }
 
 #elifdef _WIN32
@@ -52,8 +55,11 @@ int io::open(wchar_t const* path, int flags) noexcept;
 #endif
 
 fd& fd::operator=(fd const& rhs) noexcept {
-  if (m_fd != rhs.m_fd && rhs) {
-    if (*this) io::close(m_fd);
+  if (*this && rhs) {
+    if (m_fd != rhs.m_fd) {
+      m_fd = io::duplicate_fd(m_fd, rhs.m_fd);
+    }
+  } else if (rhs) {
     m_fd = io::duplicate_fd(rhs.m_fd);
   }
   return *this;
