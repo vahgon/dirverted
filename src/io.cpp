@@ -1,3 +1,5 @@
+#include "io.hpp"
+
 #ifdef __linux__
 # include <syscall.h>
 # include <unistd.h>
@@ -6,94 +8,87 @@
 
 #include <fcntl.h>
 
-#include "flags.hpp"
-#include "io.hpp"
-#include "stat.hpp"
-
-using file_desc = dvrt::detail::file_desc;
-using ulong     = unsigned long;
-namespace io    = dvrt::detail::io;
+namespace io = dvrt::detail::io;
+using     fd = dvrt::detail::fd;
 
 #ifdef __linux__
+int io::open(char const* path) noexcept {
+  return ::open(path, O_CLOEXEC);
+}
+
 # ifdef SYS_openat2
-int io::open(char const* path, int dirfd) noexcept {
-  struct open_how how{ .flags   = O_RDONLY,
-                       .resolve = RESOLVE_IN_ROOT };
+int io::openat(char const* path, int dirfd) noexcept {
+  struct open_how how{ .flags   = static_cast<decltype(how.flags)>(O_CLOEXEC),
+                       .resolve = static_cast<decltype(how.resolve)>(RESOLVE_IN_ROOT) };
+
   return static_cast<int>(
     syscall(SYS_openat2, dirfd, path, __builtin_addressof(how), sizeof(how)));
 }
-
-int io::open(char const* path, int dirfd, ulong flags, ulong resolve, ulong mode) noexcept {
-  struct open_how how{ .flags   = flags,
-                       .mode    = mode,
-                       .resolve = resolve };
-  return static_cast<int>(
-    syscall(SYS_openat2, dirfd, path, __builtin_addressof(how), sizeof(how)));
-}
-
 # else
-int io::open(char const* path, int flags) noexcept {
-  return ::open(path, flags);
+int io::openat(char const* path, int dirfd) noexcept {
+  return ::openat(dirfd, path, O_CLOEXEC);
 }
 # endif
 int io::close(int fd) noexcept {
   return !::close(fd);
 }
-#elifdef _WIN32
-#endif
 
-file_desc::file_desc(file_desc&& rhs) noexcept {
-  if (this != &rhs) {
-    m_fd = rhs.m_fd;
-    rhs.m_fd = -1;
+int io::duplicate_fd(int newfd) noexcept {
+  if (int duped_fd{}; (duped_fd = ::dup3(io::InvalidFileDesc, newfd, O_CLOEXEC)) != -1) {
+    return duped_fd;
   }
+  return io::InvalidFileDesc;
 }
 
-file_desc& file_desc::operator=(file_desc&& rhs) noexcept {
-  if (this != &rhs) {
-    if (m_fd != -1) io::close(m_fd);
-    m_fd = rhs.m_fd;
-    rhs.m_fd = -1;
+int io::duplicate_fd(int oldfd, int newfd) noexcept {
+  if (int duped_fd{}; (duped_fd = ::dup3(oldfd, newfd, O_CLOEXEC)) != -1) {
+    return duped_fd;
+  }
+  return io::InvalidFileDesc;
+}
+
+#elifdef _WIN32
+int io::open(wchar_t const* path, int flags) noexcept;
+#endif
+
+fd& fd::operator=(fd const& rhs) noexcept {
+  if (m_fd != rhs.m_fd && rhs) {
+    if (*this) io::close(m_fd);
+    m_fd = io::duplicate_fd(rhs.m_fd);
   }
   return *this;
 }
 
-int64_t file_desc::get_mtime(this file_desc fd) noexcept {
-  stat_t st;
-
-  if (io::stat(nullptr, fd.m_fd, flags::AtEmptyPath, __builtin_addressof(st), flags::MTime)) {
-    return st.stx_mtime.tv_sec;
-  } else {
-    return 0;
+fd& fd::operator=(fd&& rhs) noexcept {
+  if (m_fd != rhs.m_fd && rhs) {
+    if (*this) io::close(m_fd);
+    m_fd = rhs.release();
   }
+  return *this;
 }
 
-int64_t file_desc::get_atime(this file_desc fd) noexcept {
-  stat_t st;
-
-  if (io::stat(nullptr, fd.m_fd, flags::AtEmptyPath, __builtin_addressof(st), flags::ATime)) {
-    return st.stx_mtime.tv_sec;
-  } else {
-    return 0;
-  }
+fd& fd::operator=(int fd) noexcept {
+  if (m_fd != io::InvalidFileDesc) io::close(m_fd);
+  m_fd = fd;
+  return *this;
 }
 
-int64_t file_desc::get_btime(this file_desc fd) noexcept {
-  stat_t st;
-
-  if (io::stat(nullptr, fd.m_fd, flags::AtEmptyPath, __builtin_addressof(st), flags::BTime)) {
-    return st.stx_mtime.tv_sec;
-  } else {
-    return 0;
-  }
+fd& fd::operator=(char const* path) noexcept {
+  if (m_fd != io::InvalidFileDesc) io::close(m_fd);
+  m_fd = io::open(path);
+  return *this;
 }
 
-uint64_t file_desc::get_size(this file_desc fd) noexcept {
-  stat_t st;
+fd::operator bool() const noexcept {
+  return m_fd != io::InvalidFileDesc;
+}
 
-  if (io::stat(nullptr, fd.m_fd, flags::AtEmptyPath, __builtin_addressof(st), flags::Size)) {
-    return st.stx_size;
-  } else {
-    return 0;
-  }
+fd::operator int() const noexcept {
+  return m_fd;
+}
+
+int fd::release() noexcept {
+  int tmp = m_fd;
+  m_fd = io::InvalidFileDesc;
+  return m_fd;
 }
