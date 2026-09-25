@@ -2,10 +2,9 @@
 
 #include "io.hpp"
 
+using path    = dvrt::path;
 using fd_base = dvrt::detail::fd_base;
 using fd      = dvrt::detail::fd;
-
-using path    = dvrt::path;
 
 fd_base::operator bool(this fd_base self) noexcept {
   return self.m_fd != io::detail::InvalidFileDesc;
@@ -97,4 +96,8 @@ path& path::replace_filename(path const&) {
 
 path& path::replace_extension(path const&) {
 
+}
+
+auto path::absolute_path() const -> std::unique_ptr<char[], abs_path_deleter> {
+  return std::unique_ptr<char[], abs_path_deleter>{ io::abs_path(m_path), abs_path_deleter{} };
 }

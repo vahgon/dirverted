@@ -5,10 +5,11 @@
 # include <stdlib.h>
 #endif
 
-
 #include <memory>
 
-namespace dvrt::io::detail {
+#include "detail.hpp"
+
+namespace dvrt::io {
 
 inline constexpr int InvalidFileDesc = -1;
 
@@ -30,24 +31,7 @@ int close(int) noexcept;
 [[nodiscard]] int open(wchar_t const*, int) noexcept;
 #endif
 
-}  // namespace dvrt::detail::io
+auto get_abs_path(char const*) -> std::unique_ptr<char[],
+                                  decltype([](void* ptr) { std::free(ptr); })>;
 
-#ifdef __linux__
-# include <dirent.h>
-#endif 
-
-namespace dvrt::io::detail {
-
-#ifdef __linux__
-DIR* fdiropen(int) noexcept;
-#endif
-
-inline auto del = [](char const* ptr) { std::free(static_cast<void*>(const_cast<char*>(ptr))); };
-
-using abs_path_t = std::unique_ptr<char const*, decltype(del)>;
-
-inline auto get_abs(char const* path) {
-  return std::unique_ptr<char const[], decltype(del)>{ abs_path(path), del };
-}
-
-}  // namespace dvrt::detail::io
+}  // namespace dvrt::io

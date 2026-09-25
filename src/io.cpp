@@ -7,7 +7,9 @@
 #elifdef _WIN32
 #endif
 
-namespace io = dvrt::io::detail;
+#include <cstdlib>
+
+namespace io = dvrt::io;
 
 #ifdef __linux__
 int io::open(char const* path) noexcept {
@@ -33,7 +35,7 @@ int io::close(int fd) noexcept {
 }
 
 char* io::abs_path(char const* rel_path) noexcept {
-  return ::realpath(const_cast<char*>(rel_path), nullptr);
+  return ::realpath(rel_path, nullptr);
 }
 
 int io::duplicate_fd(int fd_doner) noexcept {

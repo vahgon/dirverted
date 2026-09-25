@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 namespace dvrt::detail {
 
 class fd_base {
@@ -49,6 +51,11 @@ class fd final : public fd_base {
 namespace dvrt {
 
 class path {
+  struct abs_path_deleter {
+    static void operator()(void* ptr) {
+      std::free(ptr); };
+  };
+
  public:
   path() = default;
 
