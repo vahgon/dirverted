@@ -10,10 +10,10 @@ class fd_base {
   : m_fd{ t_fd } {}
 
  public:
+  [[nodiscard]] int raw(this fd_base)  noexcept;
+
   explicit operator bool(this fd_base) noexcept;
   explicit operator  int(this fd_base) noexcept;
-
-  [[nodiscard]] int  raw(this fd_base)       noexcept;
 
  protected:
   int m_fd{ -1 };  // (-1 == invalid fdesc)
@@ -76,23 +76,21 @@ class path {
   [[nodiscard]] bool is_symlink()   const noexcept;
   [[nodiscard]] bool is_absolute()  const noexcept;
   [[nodiscard]] bool is_relative()  const noexcept;
-
   [[nodiscard]] bool is_open()      const noexcept;
-  [[nodiscard]] bool has_filename() const noexcept;
 
  public:
   [[nodiscard]] char const* extension();
 
  public:
-  template<typename path_input>
-  path& append(path_input&);
-
+  path& append(char const*);
   path& replace_filename(path const&);
   path& replace_extension(path const&);
 
+  auto absolute_path() const -> std::unique_ptr<char[], abs_path_deleter>;
+
  private:
   char const* m_path{ nullptr };
-  detail::fd      m_path_fd{ -1 };
+  detail::fd  m_path_fd{ -1 };
 };
 
 }  // namespace dvrt
