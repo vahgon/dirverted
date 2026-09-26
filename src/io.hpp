@@ -31,7 +31,4 @@ int close(int) noexcept;
 [[nodiscard]] int open(wchar_t const*, int) noexcept;
 #endif
 
-auto get_abs_path(char const*) -> std::unique_ptr<char[],
-                                  decltype([](void* ptr) { std::free(ptr); })>;
-
 }  // namespace dvrt::io
