@@ -75,12 +75,12 @@ int fd::release() noexcept {
 path::path(char const* t_path) noexcept :
   m_path{ t_path },
   m_path_fd{ t_path },
-  m_path_stats{ io::set_file_stats(m_path_fd.raw()) }
+  m_path_stats{ io::set_file_stats(m_path_fd.raw(), flags::statx::Mode) }
 {}
 
 path::path(int t_fd) noexcept :
   m_path_fd{ t_fd },
-  m_path_stats{ io::set_file_stats(t_fd) }
+  m_path_stats{ io::set_file_stats(t_fd, flags::statx::Mode) }
 {}
 
 auto path::absolute_path() const noexcept -> std::unique_ptr<char[], abs_path_deleter> {
