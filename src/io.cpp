@@ -7,8 +7,6 @@
 #elifdef _WIN32
 #endif
 
-#include <cstdlib>
-
 namespace io = dvrt::io;
 
 #ifdef __linux__
@@ -53,11 +51,6 @@ int io::duplicate_fd(int fd_orig, int fd_doner) noexcept {
     return InvalidFileDesc;
   }
 }
-
-DIR* dir_open(int) noexcept {
-
-}
-
 #elifdef _WIN32
 int io::open(wchar_t const* path, int flags) noexcept;
 #endif
