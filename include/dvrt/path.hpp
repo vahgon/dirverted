@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <memory>
 
 namespace dvrt::detail {
@@ -9,7 +10,7 @@ class fd_base {
   fd_base() noexcept = default;
 
   explicit fd_base(int t_fd) noexcept
-  : m_fd{ t_fd } {}
+  : m_fdesc_value{ t_fd } {}
 
  public:
   [[nodiscard]] int raw(this fd_base)  noexcept;
@@ -18,7 +19,7 @@ class fd_base {
   explicit operator  int(this fd_base) noexcept;
 
  protected:
-  int m_fd{ -1 };  // (-1 == invalid fdesc)
+  int m_fdesc_value{ -1 };  // (-1 == invalid fdesc)
 };
 
 class fd final : public fd_base {
@@ -42,8 +43,18 @@ class fd final : public fd_base {
   fd& operator=(char const*)  noexcept;
   fd& operator=(int)          noexcept;
 
+ public:
+  [[nodiscard]] bool is_regfile()   const noexcept;
+  [[nodiscard]] bool is_directory() const noexcept;
+  [[nodiscard]] bool is_symlink()   const noexcept;
+  [[nodiscard]] bool is_absolute()  const noexcept;
+  [[nodiscard]] bool is_relative()  const noexcept;
+  [[nodiscard]] bool is_fifo()      const noexcept;
+  [[nodiscard]] bool is_open()      const noexcept;
+
  protected:
-  [[nodiscard]] int release() noexcept;
+   [[nodiscard]] int release()    noexcept;
+   [[nodiscard]] int set_fstats() noexcept;
 };
 
 }  // namespace dvrt::detail
@@ -52,18 +63,15 @@ namespace dvrt {
 
 class path {
   struct abs_path_deleter {
-    static void operator()(void* ptr) {
+    static void operator()(void* ptr) noexcept {
       std::free(ptr); };
   };
 
  public:
   path() = default;
 
-  explicit path(char const* t_path)
-  : m_path{ t_path }, m_path_fd{ t_path } {}
-
-  explicit path(int t_file_descriptor)
-  : m_path_fd{ t_file_descriptor } {}
+  explicit path(char const*) noexcept;
+  explicit path(int)         noexcept;
 
   path(path&&)      = default;
   path(path const&) = default;
@@ -78,26 +86,26 @@ class path {
   explicit operator int()  const noexcept { return m_path_fd.raw(); }
 
  public:
-  [[nodiscard]] bool is_directory() const noexcept;
-  [[nodiscard]] bool is_reg_file()  const noexcept;
-  [[nodiscard]] bool is_symlink()   const noexcept;
-  [[nodiscard]] bool is_absolute()  const noexcept;
-  [[nodiscard]] bool is_relative()  const noexcept;
-  [[nodiscard]] bool is_open()      const noexcept;
-
- public:
-  [[nodiscard]] char const* extension();
-
- public:
   path& append(char const*);
   path& replace_filename(path const&);
   path& replace_extension(path const&);
 
-  auto absolute_path() const -> std::unique_ptr<char[], abs_path_deleter>;
+ public:
+  [[nodiscard]] auto absolute_path()  const noexcept -> std::unique_ptr<char[], abs_path_deleter>;
+  [[nodiscard]] bool is_absolute()    const noexcept;
+  [[nodiscard]] bool is_relative()    const noexcept { return !is_absolute(); }
+  [[nodiscard]] bool is_directory()   const noexcept;
+  [[nodiscard]] bool is_chardevice()  const noexcept;
+  [[nodiscard]] bool is_blockdevice() const noexcept;
+  [[nodiscard]] bool is_regfile()     const noexcept;
+  [[nodiscard]] bool is_fifo()        const noexcept;
+  [[nodiscard]] bool is_symlink()     const noexcept;
+  [[nodiscard]] bool is_sock()        const noexcept;
 
  private:
   char const* m_path{ nullptr };
   detail::fd  m_path_fd{ -1 };
+  uint32_t    m_path_stats{};
 };
 
 }  // namespace dvrt
