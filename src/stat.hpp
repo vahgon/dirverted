@@ -19,9 +19,9 @@ namespace dvrt::io {
 
 [[nodiscard]] int stat(char const*, int, ::statx&, int) noexcept;
 
-[[nodiscard]] void* allocate_stat() noexcept;
+[[nodiscard]] type::stat_t* allocate_stat() noexcept;
 
-[[nodiscard]] uint32_t set_file_stats(int) noexcept;
+[[nodiscard]] uint32_t set_file_stats(int, uint32_t) noexcept;
 #elifdef _WIN32
 #endif
 

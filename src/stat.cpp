@@ -4,7 +4,7 @@
 # include <sys/stat.h>
 #endif
 
-#include <cstdlib>
+#include <cstdint>
 
 namespace io          = dvrt::io;
 namespace constants   = dvrt::constants;
@@ -36,24 +36,24 @@ int io::stat(char const* path, int dfd, struct statx& st, int flags) noexcept {
 }
 # endif
 
-void* dvrt::io::allocate_stat() noexcept {
-  return std::malloc(sizeof(type::stat_t));
+dvrt::type::stat_t* dvrt::io::allocate_stat() noexcept {
+  return static_cast<type::stat_t*>(std::malloc(sizeof(type::stat_t)));
 }
 
-uint32_t dvrt::io::set_file_stats(int fd) noexcept {
-  type::stat_t* st_ptr{ static_cast<type::stat_t*>(io::allocate_stat()) };
-  uint32_t ftype{};
+uint32_t dvrt::io::set_file_stats(int fd, uint32_t mask) noexcept {
+  type::stat_t* st_ptr{ io::allocate_stat() };
+  uint32_t stats{};
 # ifdef __statx_defined
-  if (io::stat(nullptr, fd, *st_ptr, statx_flags::BasicStats, flags::AtEmptyPath)) {
-    ftype = (st_ptr->stx_mode & S_IFMT) << 16;
+  if (io::stat(nullptr, fd, *st_ptr, mask, flags::AtEmptyPath)) {
+    stats = (st_ptr->stx_mode & S_IFMT) << 16;  // file type
   }
 # else
   if (io::fstat(fd, *st_ptr)) {
     ftype = (st_ptr->st_mode & S_IFMT) << 16;
   }
 # endif
-  std::free(st_ptr);
-  return ftype;
+  std::free(static_cast<void*>(st_ptr));
+  return stats;
 }
 #elifdef _WIN32
 #endif
