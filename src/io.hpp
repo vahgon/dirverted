@@ -1,12 +1,5 @@
 #pragma once
 
-#ifdef __linux__
-# include <limits.h>
-# include <stdlib.h>
-#endif
-
-#include <memory>
-
 #include "detail.hpp"
 
 namespace dvrt::io {

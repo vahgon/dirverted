@@ -2,6 +2,7 @@
 
 #ifdef __linux__
 # include <fcntl.h>
+# include <stdlib.h>
 # include <syscall.h>
 # include <unistd.h>
 #elifdef _WIN32
