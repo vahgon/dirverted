@@ -4,7 +4,7 @@
 # include <sys/stat.h>
 #endif
 
-#include <cstdint>
+#include <cstdlib>
 
 namespace io        = dvrt::io;
 namespace constants = dvrt::constants;
