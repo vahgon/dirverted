@@ -4,32 +4,30 @@
 #include "stat.hpp"
 #include "detail.hpp"
 
-using path    = dvrt::path;
-using fd_base = dvrt::detail::fd_base;
-using fd      = dvrt::detail::fd;
+using path = dvrt::path;
 
-int fd_base::raw(this fd_base self) noexcept {
+int path::fd_base::raw(this fd_base self) noexcept {
   return self.m_fdesc_value;
 }
 
-fd_base::operator bool(this fd_base self) noexcept {
+path::fd_base::operator bool(this fd_base self) noexcept {
   return self.m_fdesc_value != io::InvalidFileDesc;
 }
 
-fd_base::operator int(this fd_base self) noexcept {
+path::fd_base::operator int(this fd_base self) noexcept {
   return self.m_fdesc_value;
 }
 
-fd::fd(char const* t_path) noexcept
+path::fd::fd(char const* t_path) noexcept
 : fd_base{ io::open(t_path) } {}
 
-fd::fd(fd const& rhs) noexcept
+path::fd::fd(fd const& rhs) noexcept
 : fd_base{ io::duplicate_fd(rhs.raw()) } {}
 
-fd::fd(fd&& rhs) noexcept
+path::fd::fd(fd&& rhs) noexcept
 : fd_base{ rhs.release() } {}
 
-fd& fd::operator=(fd const& rhs) noexcept {
+path::fd& path::fd::operator=(fd const& rhs) noexcept {
   if (*this && rhs) {
     if (m_fdesc_value != rhs.m_fdesc_value) {
       m_fdesc_value = io::duplicate_fd(m_fdesc_value, rhs.m_fdesc_value);
@@ -40,7 +38,7 @@ fd& fd::operator=(fd const& rhs) noexcept {
   return *this;
 }
 
-fd& fd::operator=(fd&& rhs) noexcept {
+path::fd& path::fd::operator=(fd&& rhs) noexcept {
   if (m_fdesc_value != rhs.m_fdesc_value && rhs) {
     if (*this) io::close(m_fdesc_value);
     m_fdesc_value = rhs.release();
@@ -48,25 +46,25 @@ fd& fd::operator=(fd&& rhs) noexcept {
   return *this;
 }
 
-fd& fd::operator=(int fd) noexcept {
+path::fd& path::fd::operator=(int fd) noexcept {
   if (m_fdesc_value != io::InvalidFileDesc) io::close(m_fdesc_value);
   m_fdesc_value = fd;
   return *this;
 }
 
-fd& fd::operator=(char const* path) noexcept {
+path::fd& path::fd::operator=(char const* path) noexcept {
   if (m_fdesc_value != io::InvalidFileDesc) io::close(m_fdesc_value);
   m_fdesc_value = io::open(path);
   return *this;
 }
 
-fd::~fd() {
+path::fd::~fd() {
   if (m_fdesc_value != io::InvalidFileDesc) {
     io::close(m_fdesc_value);
   }
 }
 
-int fd::release() noexcept {
+int path::fd::release() noexcept {
   int released_fd = m_fdesc_value;
   m_fdesc_value = io::InvalidFileDesc;
   return released_fd;
