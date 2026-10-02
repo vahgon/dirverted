@@ -6,9 +6,8 @@
 
 #include <cstdint>
 
-namespace io          = dvrt::io;
-namespace constants   = dvrt::constants;
-namespace statx_flags = dvrt::flags::statx;
+namespace io        = dvrt::io;
+namespace constants = dvrt::constants;
 
 using stat_mode_t   = std::conditional_t<constants::StatxSupport,
                                         uint16_t, int>;

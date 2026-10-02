@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cstdint>
-
 #include "detail.hpp"
 
 namespace dvrt::io {
@@ -25,4 +23,4 @@ namespace dvrt::io {
 #elifdef _WIN32
 #endif
 
-}  // namespace dvrt
+}  // namespace dvrt::io

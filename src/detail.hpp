@@ -4,7 +4,6 @@
 #include <cstdint>
 
 #ifdef __linux__
-// forward declarations for stat & statx structs
 struct stat;
 struct statx;
 #endif
